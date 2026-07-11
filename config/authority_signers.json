@@ -1,0 +1,17 @@
+{
+ "_status": "UNRATIFIED TEMPLATE - owner must edit, ratify (date + sign-off), then load; loads fail closed while this line stands",
+ "_table": "authority_signers",
+ "_purpose": "Humans authorized on writeoff/plan authority",
+ "_fields": [
+  "intent",
+  "signer",
+  "key_ref"
+ ],
+ "entries": [
+  {
+   "intent": "<example>",
+   "signer": "<example>",
+   "key_ref": "<example>"
+  }
+ ]
+}

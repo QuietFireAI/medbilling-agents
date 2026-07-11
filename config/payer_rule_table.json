@@ -1,0 +1,21 @@
+{
+ "_status": "UNRATIFIED TEMPLATE - owner must edit, ratify (date + sign-off), then load; loads fail closed while this line stands",
+ "_table": "payer_rule_table",
+ "_purpose": "Filing limits, auth requirements, appeal windows per payer/plan",
+ "_fields": [
+  "payer_id",
+  "plan",
+  "filing_days",
+  "auth_rules_ref",
+  "appeal_days"
+ ],
+ "entries": [
+  {
+   "payer_id": "<example>",
+   "plan": "<example>",
+   "filing_days": "<example>",
+   "auth_rules_ref": "<example>",
+   "appeal_days": "<example>"
+  }
+ ]
+}

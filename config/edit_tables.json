@@ -1,0 +1,19 @@
+{
+ "_status": "UNRATIFIED TEMPLATE - owner must edit, ratify (date + sign-off), then load; loads fail closed while this line stands",
+ "_table": "edit_tables",
+ "_purpose": "Claim-scrub edit rules with citations (version-pinned)",
+ "_fields": [
+  "edit_id",
+  "rule",
+  "citation",
+  "version"
+ ],
+ "entries": [
+  {
+   "edit_id": "<example>",
+   "rule": "<example>",
+   "citation": "<example>",
+   "version": "<example>"
+  }
+ ]
+}

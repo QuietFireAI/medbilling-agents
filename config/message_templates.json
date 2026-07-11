@@ -1,0 +1,19 @@
+{
+ "_status": "UNRATIFIED TEMPLATE - owner must edit, ratify (date + sign-off), then load; loads fail closed while this line stands",
+ "_table": "message_templates",
+ "_purpose": "Approved patient communication templates",
+ "_fields": [
+  "template_id",
+  "purpose",
+  "body",
+  "approved_by"
+ ],
+ "entries": [
+  {
+   "template_id": "<example>",
+   "purpose": "<example>",
+   "body": "<example>",
+   "approved_by": "<example>"
+  }
+ ]
+}

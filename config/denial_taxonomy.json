@@ -1,0 +1,17 @@
+{
+ "_status": "UNRATIFIED TEMPLATE - owner must edit, ratify (date + sign-off), then load; loads fail closed while this line stands",
+ "_table": "denial_taxonomy",
+ "_purpose": "Ratified denial triage categories",
+ "_fields": [
+  "category",
+  "clock_basis",
+  "path"
+ ],
+ "entries": [
+  {
+   "category": "<example>",
+   "clock_basis": "<example>",
+   "path": "<example>"
+  }
+ ]
+}
