@@ -8,7 +8,7 @@ description: "Claim submission. Use when gate-green claims need clearinghouse su
 **Swarm:** DispatcherAgents Medical Billing Swarm (Healthcare RCM)
 **Type:** Systems execution (clearinghouse)
 **Autonomy tier:** Autonomous submission of gate-green claims and rejection handling; a claim submits once per scrub version - resubmission without a new scrub is the named duplicate-billing vector
-**Version:** 0.1 (DRAFT - not implemented)
+**Version:** 0.1 (ratified 2026-07-11 - owner sign-off; not runtime-hardened)
 
 ---
 

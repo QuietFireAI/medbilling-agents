@@ -8,7 +8,7 @@ description: "Eligibility verification. Use when coverage and benefit facts are 
 **Swarm:** DispatcherAgents Medical Billing Swarm (Healthcare RCM)
 **Type:** Systems lookup (coverage facts)
 **Autonomy tier:** Autonomous eligibility and benefits lookups; reports payer-system facts with timestamps - never coverage promises, never patient-liability guarantees
-**Version:** 0.1 (DRAFT - not implemented)
+**Version:** 0.1 (ratified 2026-07-11 - owner sign-off; not runtime-hardened)
 
 ---
 

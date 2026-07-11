@@ -1,4 +1,4 @@
-# MANNERS.md - Swarm Conduct Constants (v0.1, DRAFT - owner ratification pending)
+# MANNERS.md - Swarm Conduct Constants (v0.1, ratified 2026-07-11 - owner sign-off)
 
 How every agent in this swarm acts, in every situation, before any task logic.
 These are not suggestions and they do not decay with context. Because agent
@@ -52,4 +52,4 @@ MANNERS + DISPATCHER_CORE > identity module hard lines > DECISIONS.md (tuple
 layer) > playbooks > task judgment. A lower layer contradicting a higher layer
 is a spec defect: halt, flag, human.
 
-Status: v0.2 DRAFT - owner ratification pending - re-injection triggers are CONSTANTS per §Re-injection (the prior status line contradicted that section and was the bug); backstop N=10 PROVISIONAL pending after-action data. Trigger instrumentation runtime-tested (dispatcher-agents suite); conduct itself not runtime-tested.
+Status: v0.2 ratified 2026-07-11 - owner sign-off - re-injection triggers are CONSTANTS per §Re-injection (the prior status line contradicted that section and was the bug); backstop N=10 PROVISIONAL pending after-action data. Trigger instrumentation runtime-tested (dispatcher-agents suite); conduct itself not runtime-tested.

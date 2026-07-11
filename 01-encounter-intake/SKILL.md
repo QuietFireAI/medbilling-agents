@@ -8,7 +8,7 @@ description: "Encounter intake. Use when billable encounters need complete, sour
 **Swarm:** DispatcherAgents Medical Billing Swarm (Healthcare RCM)
 **Type:** Intake (charge capture)
 **Autonomy tier:** Autonomous charge-capture intake and completeness checks; NEVER assigns or changes a code - coding judgment is certified-human territory
-**Version:** 0.1 (DRAFT - not implemented)
+**Version:** 0.1 (ratified 2026-07-11 - owner sign-off; not runtime-hardened)
 
 ---
 

@@ -7,7 +7,7 @@ description: "Swarm deployment: the filing-clock engine end to end - every claim
 
 **Swarm:** DispatcherAgents Medical Billing Swarm (Healthcare RCM)
 **Type:** Deployment playbook (consumed by Agent 00 - Dispatcher)
-**Version:** 0.1 (DRAFT - not implemented)
+**Version:** 0.1 (ratified 2026-07-11 - owner sign-off; not runtime-hardened)
 
 ## Trigger
 Continuous: clock instantiation on every claim path; alerts at ratified lead-times.

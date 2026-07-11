@@ -1,4 +1,4 @@
-# Agent 10 - Predeliberated Decisions (Tuple Layer) v0.1 DRAFT
+# Agent 10 - Predeliberated Decisions (Tuple Layer) v0.1 (ratified 2026-07-11)
 
 PRE-TEXT - ROOT OF THE TUPLE DECISION TREE (owner rule, binding):
 before ANY task or decision, consult this layer. If NO suitable tuple covers

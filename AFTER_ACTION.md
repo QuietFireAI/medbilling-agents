@@ -1,4 +1,4 @@
-# AFTER_ACTION.md - Run Report Schema + Learning Loop (v0.1, DRAFT - owner ratification pending)
+# AFTER_ACTION.md - Run Report Schema + Learning Loop (v0.1, ratified 2026-07-11 - owner sign-off)
 
 Every playbook run (completed OR aborted) produces one after-action report,
 generated from the audit log - never from agent memory. Reports accumulate in
@@ -31,4 +31,4 @@ source.
    human-released batches - agent-authored learnings about agent behavior are
    exactly the self-modification surface the write-approval gate exists for.
 
-Status: v0.1 DRAFT - owner ratification pending - schema only; runtime generates the reports.
+Status: v0.1 ratified 2026-07-11 - owner sign-off - schema only; runtime generates the reports.

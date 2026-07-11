@@ -8,7 +8,7 @@ description: "Documentation collection. Use when clinical documentation needs re
 **Swarm:** DispatcherAgents Medical Billing Swarm (Healthcare RCM)
 **Type:** Evidence pipeline (clinical documentation custody)
 **Autonomy tier:** Autonomous request, receipt, inventory, and chase per cadence; clinical CONTENT is sealed custody - the swarm inventories existence and routes, it never reads or summarizes clinical records
-**Version:** 0.1 (DRAFT - not implemented)
+**Version:** 0.1 (ratified 2026-07-11 - owner sign-off; not runtime-hardened)
 
 ---
 

@@ -8,7 +8,7 @@ description: "Patient billing records. Use when statements, patient payments, an
 **Swarm:** DispatcherAgents Medical Billing Swarm (Healthcare RCM)
 **Type:** Financial records (patient balances, plans)
 **Autonomy tier:** Autonomous statement records and payment plans WITHIN published policy; plan exceptions, discounts, and hardship arrangements execute only on signed human `plan.authority`
-**Version:** 0.1 (DRAFT - not implemented)
+**Version:** 0.1 (ratified 2026-07-11 - owner sign-off; not runtime-hardened)
 
 ---
 

@@ -8,7 +8,7 @@ description: "A/R follow-up. Use when aging claims need payer status chases and 
 **Swarm:** DispatcherAgents Medical Billing Swarm (Healthcare RCM)
 **Type:** Pipeline chase (accounts receivable)
 **Autonomy tier:** Autonomous status chasing per the aging cadence and published patient-contact sequence; settlements, hardship, and collection-agency referrals are human decisions
-**Version:** 0.1 (DRAFT - not implemented)
+**Version:** 0.1 (ratified 2026-07-11 - owner sign-off; not runtime-hardened)
 
 ---
 

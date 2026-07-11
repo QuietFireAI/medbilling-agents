@@ -121,7 +121,7 @@ D = {
 def decisions_md(num, name):
     rows = "\n".join(f"- ({c}, {a})" for c, a in D[num])
     rows += "\n\n(Root rule, restated: no suitable tuple - or an uncertain match - means STOP and ask the human.)"
-    return f"""# Agent {num} - Predeliberated Decisions (Tuple Layer) v0.1 DRAFT
+    return f"""# Agent {num} - Predeliberated Decisions (Tuple Layer) v0.1 (ratified 2026-07-11)
 
 PRE-TEXT - ROOT OF THE TUPLE DECISION TREE (owner rule, binding):
 before ANY task or decision, consult this layer. If NO suitable tuple covers
@@ -144,7 +144,7 @@ def swarm_md():
     agents_list = "\n".join(f"- {a['num']} {a['name']}" for a in AGENTS)
     intents = sorted({i for i, *_ in ROUTES})
     tuples = "\n".join(f"- ({c}, {a})" for c, a in SWARM_TUPLES)
-    return f"""# SWARM.md - Framework Manifest + Swarm-Level Decisions (v0.1 DRAFT)
+    return f"""# SWARM.md - Framework Manifest + Swarm-Level Decisions (v0.1 (ratified 2026-07-11))
 
 Framework context for the dispatcher and every agent: as much predefined
 structure as exists, until learning (after-action dataset) takes over.
@@ -188,7 +188,7 @@ defect, not a change.
 ## Swarm-level decision tuples (predictable scenarios, pre-deliberated)
 {tuples}
 
-Status: v0.1 DRAFT - manifest verified against generator data at generation
+Status: v0.1 RATIFIED 2026-07-11 - manifest verified against generator data at generation
 time; not runtime-tested.
 """
 

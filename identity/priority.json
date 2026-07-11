@@ -1,5 +1,5 @@
 {
- "_status": "DRAFT - owner ratification pending (per identity module)",
+ "_status": "RATIFIED 2026-07-11 - owner sign-off, approved as written",
  "_doctrine": "JIT run-priority per core doctrine: class 1 = clock-critical (prior auth blocking care, appeal deadlines, timely filing), class 2 = active revenue-cycle lifecycle and books, class 3 = aging follow-up. Pacing over braking: the siding scheduler paces class contention; nothing slam-stops.",
  "classes": {
   "P01": 2,

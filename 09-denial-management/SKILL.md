@@ -8,7 +8,7 @@ description: "Denial management. Use when denials need taxonomy triage, deadline
 **Swarm:** DispatcherAgents Medical Billing Swarm (Healthcare RCM)
 **Type:** Recovery preparation (denials, appeals)
 **Autonomy tier:** Autonomous denial triage per the ratified reason taxonomy and appeal-package assembly; the appeal DECISION, clinical argument, and signature are human
-**Version:** 0.1 (DRAFT - not implemented)
+**Version:** 0.1 (ratified 2026-07-11 - owner sign-off; not runtime-hardened)
 
 ---
 
