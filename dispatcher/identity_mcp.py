@@ -74,18 +74,30 @@ def _boot_conformance():
     hub = Hub(routes, probe_audit,
               signature_verifier=verifier.verifier())
     hub.register("human", lambda e: None)
-    hub.register("08", lambda e: None)
     hub.on_turn_start()
-    unsigned = Envelope(from_agent="human", to_agent="08",
-                        intent="refund.authority",
-                        client_context_id="conformance-probe",
-                        payload={"amount": 1.0},
-                        provenance={"source": "human",
-                                    "captured_at": "boot",
-                                    "verbatim_available": True})
-    res = hub.send(unsigned)
-    if res.get("status") == "ack":
-        problems.append("signer gate OPEN: unsigned authority accepted")
+    # Probe THIS identity's own first authority lane (a route requiring a
+    # signature), so the gate is tested for the right reason on any
+    # identity - never a hardcoded intent that might be an illegal route.
+    all_routes = json.load(open(ROUTES_PATH))["routes"]
+    auth = next((r for r in all_routes
+                 if "authorized" in r["intent"] or "authority" in r["intent"]),
+                None)
+    if auth is None:
+        problems.append("no authority lane found to test the signer gate")
+    else:
+        to = auth["receivers"][0]
+        hub.register(to, lambda e: None)
+        unsigned = Envelope(from_agent=auth["senders"][0], to_agent=to,
+                            intent=auth["intent"],
+                            client_context_id="conformance-probe",
+                            payload={"probe": True},
+                            provenance={"source": "human",
+                                        "captured_at": "boot",
+                                        "verbatim_available": True})
+        res = hub.send(unsigned)
+        if res.get("status") == "ack":
+            problems.append(
+                f"signer gate OPEN: unsigned {auth['intent']} accepted")
 
     # 3. Audit chain verifies and is tamper-evident.
     if not probe_audit.verify_chain().get("ok"):
@@ -117,7 +129,8 @@ class GovernedIdentity:
         self.hub.on_turn_start()
 
     # Spoke modules known to this wrapper, by detection (not by folder name).
-    KNOWN = {"medbilling_spokes": "_wire_medbilling"}
+    KNOWN = {"medbilling_spokes": "_wire_medbilling",
+             "listing_spokes": "_wire_listing"}
 
     def _wire_spokes(self):
         """Mount real spokes by DETECTING which spoke module is present in
@@ -171,6 +184,42 @@ class GovernedIdentity:
                 self.hub.register(aid, sp.handle)
         self.spokes = s
 
+    def _wire_listing(self, _m):
+        """Wire the full listing swarm (18 spokes) exactly as the e2e
+        harness does. The entry module is listing_spokes; the rest are
+        listing_spokes_NN."""
+        import importlib
+        L = lambda n: importlib.import_module(f"dispatcher.{n}")
+        base = L("listing_spokes")
+        s = {
+            "01": base.Spoke01LeadCapture(self.hub,
+                                          brokerage_scope={"L1", "MLS-1"}),
+            "02": L("listing_spokes_02").Spoke02LeadQualification(self.hub),
+            "04": L("listing_spokes_04").Spoke04ListingDescription(self.hub),
+            "05": L("listing_spokes_05").Spoke05MLSListingManagement(self.hub),
+            "06": L("listing_spokes_06").Spoke06ShowingScheduler(self.hub),
+            "07": L("listing_spokes_07").Spoke07TransactionCoordinator(self.hub),
+            "08": L("listing_spokes_08").Spoke08DocumentCollection(
+                self.hub, expected_senders={}),
+            "09": L("listing_spokes_09").Spoke09VendorCoordination(
+                self.hub, roster={"v-photo": {"kind": "photography",
+                                              "license_expiry": "2027-01-01",
+                                              "insurance_expiry": "2027-01-01",
+                                              "regulated": False}}),
+            "10": L("listing_spokes_10").Spoke10MarketData(self.hub),
+            "11": L("listing_spokes_11").Spoke11ClientCommunication(self.hub),
+            "12": L("listing_spokes_12").Spoke12MarketingCampaign(self.hub),
+            "13": L("listing_spokes_13").Spoke13BuyerSearchMatch(self.hub),
+            "14": base.Spoke14CRMPipeline(self.hub),
+            "15": L("listing_spokes_15").Spoke15FinancialTracking(self.hub),
+            "16": L("listing_spokes_16").Spoke16AfterCloseReferral(self.hub),
+            "17": L("listing_spokes_17").Spoke17ComplianceFairHousing(self.hub),
+            "18": L("listing_spokes_18").Spoke18CalendarTask(self.hub),
+        }
+        for aid, sp in s.items():
+            self.hub.register(aid, sp.handle)
+        self.spokes = s
+
     # --- front-door operations -------------------------------------------
     def describe(self):
         routes = json.load(open(ROUTES_PATH))
@@ -212,6 +261,28 @@ class GovernedIdentity:
         entry points. Anything not a legal front-door op is refused."""
         modname = getattr(self.spoke_mod, "__name__", "") if self.spoke_mod \
             else ""
+        if modname.endswith("listing_spokes"):
+            if intent == "listing.authorize":
+                # front door: the signed new-listing authorization (P01)
+                from dispatcher.core import Envelope
+                env = Envelope(from_agent="human", to_agent="05",
+                               intent="listing.change.authorized",
+                               client_context_id=ctx, payload=payload,
+                               provenance={"source": "mcp-host",
+                                           "captured_at": "runtime",
+                                           "verbatim_available": True})
+                self.signer.sign(env)
+                res = self.hub.send(env)
+                return {"ok": res.get("status") == "ack",
+                        "context_id": ctx,
+                        "note": "listing authorization submitted; the swarm "
+                                "runs P01 setup->production->go-live behind "
+                                "the gates",
+                        "audit_entries": len(self.hub.audit.read())}
+            return {"ok": False, "context_id": ctx,
+                    "reason": f"'{intent}' is not a legal front-door intent "
+                              f"for listing; the signed lane is "
+                              f"'listing.authorize'"}
         if modname.endswith("medbilling_spokes"):
             if intent == "encounter.capture":
                 self.spokes["03"].db[ctx] = {"status":
