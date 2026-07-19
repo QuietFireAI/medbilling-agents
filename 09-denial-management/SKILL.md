@@ -63,6 +63,7 @@ Dispatcher returns an `ack`.
 | IN | ← 12 Compliance & Deadlines | Appeal deadline alerts | `deadline.alert` |
 | OUT | → 13 Billing Records | Record lookups | `record.request` |
 | IN | ← 13 Billing Records | Record responses | `record.response` |
+| IN | ← human | Signed appeal-abandon authority - a denial ends signed or not at all | `appeal.abandon.authority` |
 
 This agent has no other edges. If a task appears to require any other
 communication path, that is an ambiguity condition (section 6) - stop and ask

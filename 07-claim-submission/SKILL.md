@@ -60,6 +60,8 @@ Dispatcher returns an `ack`.
 | OUT | → 10 / 13 | Status transitions | `claim.status` |
 | OUT | → 02 / 13 | Rejections with codes verbatim | `rejection.notice` |
 | IN | ← 12 Compliance & Deadlines | Timely-filing alerts | `deadline.alert` |
+| IN | ← 08 | Secondary claim ready after primary remit | `secondary.claim.ready` |
+| IN | ← 03 | Coverage change affecting unsubmitted/in-flight claims | `eligibility.result` |
 
 This agent has no other edges. If a task appears to require any other
 communication path, that is an ambiguity condition (section 6) - stop and ask

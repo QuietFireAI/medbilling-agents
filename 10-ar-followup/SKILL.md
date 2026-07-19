@@ -62,6 +62,9 @@ Dispatcher returns an `ack`.
 | IN | ← 12 Compliance & Deadlines | Aging and filing alerts | `deadline.alert` |
 | OUT | → 13 Billing Records | Record lookups | `record.request` |
 | IN | ← 13 Billing Records | Record responses | `record.response` |
+| IN | ← human | Signed collection referral authority | `collection.referral.authority` |
+| IN | ← 04 | Patient opt-out - patient lane halts, payer lane continues | `patient.optout` |
+| IN | ← 03 | Coverage change on accounts in follow-up | `eligibility.result` |
 
 This agent has no other edges. If a task appears to require any other
 communication path, that is an ambiguity condition (section 6) - stop and ask

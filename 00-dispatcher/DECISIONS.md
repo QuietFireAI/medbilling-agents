@@ -19,5 +19,7 @@ constrains everything.
 - (duplicate envelope_id arrives, re-ack the original outcome; never process twice)
 - (compliance.hold received mid-run, suspend the named account's traffic; only 12's release or human direction resumes it)
 - (a spoke reports done without its artifact, treat as not-done; the artifact is the proof)
+- (authority intent arrives with no registered signer for that lane, reject fail-closed + integrity.violation; an unregistered authority lane does not exist)
+- (an agent's wait on another agent passes its timeout, agent.status to 14; waits are visible by rule, never discovered by surprise)
 
 (Root rule, restated: no suitable tuple - or an uncertain match - means STOP and ask the human.)

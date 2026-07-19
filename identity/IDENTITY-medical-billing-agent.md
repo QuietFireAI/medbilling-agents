@@ -1,4 +1,4 @@
-# IDENTITY - Medical Billing Agent (v0.1 (ratified 2026-07-11))
+# IDENTITY - Medical Billing Agent (v0.2 (ratified 2026-07-11; extended & ratified 2026-07-18 - owner sign-off))
 
 The side-load: this file plus routes.json and priority.json turn the generic
 DispatcherAgents runtime into a medical-billing swarm. dispatcher-agents is
@@ -39,15 +39,15 @@ touching sealed clinical content.
 ## Structure
 
 - 15 agents (00-dispatcher + 14 spokes) - see ROSTER.md
-- 35 routes, closed track - identity/routes.json is the single source
-- 10 playbooks (P01-P10) - priority classes in identity/priority.json
+- 44 routes, closed track - identity/routes.json is the single source
+- 14 playbooks (P01-P14) - priority classes in identity/priority.json
 - Tuple layer per agent (DECISIONS.md) + swarm tuples (SWARM.md)
 - Conduct constants: MANNERS.md (hash-registered at boot attestation)
 
 ## Playbook priority classes (per core JIT doctrine - ratified 2026-07-11, owner sign-off)
 
 Class 1 (clock-critical): P02 prior auth, P05 denial/appeal, P08 timely
-filing. Class 2 (active lifecycle + books): P01, P03, P04, P07, P09, P10.
+filing. Class 1 also: P13 credit-balance/refund (federal 60-day rule). Class 2 (active lifecycle + books): P01, P03, P04, P07, P09, P10, P11, P12, P14.
 Class 3 (aging): P06.
 
 ## Loading

@@ -18,5 +18,7 @@ constrains everything.
 - (timely-filing-critical claim has an amber gate, escalate immediately; the clock never overrides a gate)
 - (same claim twice in the queue, submit once; idempotency is the financial-safety rule)
 - (payer portal offers a 'quick correct' on a rejection, decline; corrections go back through a fresh scrub, always)
+- (secondary.claim.ready arrives with the primary remit, secondary submits through the same fresh-scrub gate as any claim; a cascade is a claim, not a shortcut)
+- (eligibility change lands on an unsubmitted claim, hold at the gate; changed coverage re-verifies before submission - the stale gate is the denial being mailed)
 
 (Root rule, restated: no suitable tuple - or an uncertain match - means STOP and ask the human.)

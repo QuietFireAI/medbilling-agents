@@ -18,6 +18,8 @@ Connected playbooks: all (transport/queues)
 | 00.03 | duplicate envelope_id arrives | re-ack the original outcome; never process twice |
 | 00.04 | compliance.hold received mid-run | suspend the named account's traffic; only 12's release or human direction resumes it |
 | 00.05 | a spoke reports done without its artifact | treat as not-done; the artifact is the proof |
+| 00.06 | authority intent arrives with no registered signer for that lane | reject fail-closed + integrity.violation; an unregistered authority lane does not exist |
+| 00.07 | an agent's wait on another agent passes its timeout | agent.status to 14; waits are visible by rule, never discovered by surprise |
 
 ## Agent 01 - encounter-intake
 Connected playbooks: none (tuple-layer only)
@@ -30,7 +32,7 @@ Connected playbooks: none (tuple-layer only)
 | 01.04 | encounter arrives for a provider not in the roster | hold; clarification - an unrostered provider is a credentialing question, not a typo |
 
 ## Agent 02 - claim-scrubbing
-Connected playbooks: P01
+Connected playbooks: P01, P11, P12
 
 | # | Crossing | Predeliberated answer |
 |---|---|---|
@@ -40,7 +42,7 @@ Connected playbooks: P01
 | 02.04 | a mechanical fix has two candidate source records | no fix; exception with both - two sources is judgment |
 
 ## Agent 03 - eligibility-verification
-Connected playbooks: P01, P02
+Connected playbooks: P01, P02, P11, P12
 
 | # | Crossing | Predeliberated answer |
 |---|---|---|
@@ -48,9 +50,10 @@ Connected playbooks: P01, P02
 | 03.02 | two payers both show active (COB) | report both with effective dates; primacy per COB table or human |
 | 03.03 | portal and 271 disagree on benefits | report both with timestamps; the discrepancy is the fact |
 | 03.04 | verification requested for a future DOS beyond payer window | report the window limit; never extrapolate coverage forward |
+| 03.05 | re-verify shows coverage changed on an in-flight claim | eligibility.result to 07 and 10 as well; a mid-cycle change re-opens gates, never rewrites history |
 
 ## Agent 04 - patient-communication
-Connected playbooks: P06, P07
+Connected playbooks: P06, P07, P13
 
 | # | Crossing | Predeliberated answer |
 |---|---|---|
@@ -58,9 +61,11 @@ Connected playbooks: P06, P07
 | 04.02 | inability-to-pay mentioned alongside a question | answer from posted facts AND route the hardship verbatim; both, always |
 | 04.03 | merge amount differs from current posted balance | hold the send; stale amounts in patient messages are the named failure |
 | 04.04 | patient reply contains clinical questions | human queue verbatim; billing voice never answers clinical |
+| 04.05 | patient replies STOP or requests no contact | patient.optout to 10, 11, 13 same turn; confirm once, then silence - the sequence dies immediately, no final touch |
+| 04.06 | legally required notice due on an opted-out account | route to human with the opt-out named; required-by-law is a human call with both facts, never an automatic override |
 
 ## Agent 05 - documentation-collection
-Connected playbooks: P01, P02, P05
+Connected playbooks: P01, P02, P05, P14
 
 | # | Crossing | Predeliberated answer |
 |---|---|---|
@@ -80,7 +85,7 @@ Connected playbooks: P01, P02
 | 06.04 | payer requests clinical justification by phone | route to human; the swarm never voices medical necessity |
 
 ## Agent 07 - claim-submission
-Connected playbooks: P03, P08
+Connected playbooks: P03, P08, P11, P12
 
 | # | Crossing | Predeliberated answer |
 |---|---|---|
@@ -88,9 +93,11 @@ Connected playbooks: P03, P08
 | 07.02 | timely-filing-critical claim has an amber gate | escalate immediately; the clock never overrides a gate |
 | 07.03 | same claim twice in the queue | submit once; idempotency is the financial-safety rule |
 | 07.04 | payer portal offers a 'quick correct' on a rejection | decline; corrections go back through a fresh scrub, always |
+| 07.05 | secondary.claim.ready arrives with the primary remit | secondary submits through the same fresh-scrub gate as any claim; a cascade is a claim, not a shortcut |
+| 07.06 | eligibility change lands on an unsubmitted claim | hold at the gate; changed coverage re-verifies before submission - the stale gate is the denial being mailed |
 
 ## Agent 08 - payment-posting
-Connected playbooks: P04
+Connected playbooks: P04, P12, P13
 
 | # | Crossing | Predeliberated answer |
 |---|---|---|
@@ -98,6 +105,10 @@ Connected playbooks: P04
 | 08.02 | payer pays differently than the contract computes | post as paid, variance to 12; never adjust the difference away |
 | 08.03 | same remit file arrives twice | post once; remit reference is the idempotency key |
 | 08.04 | signed write-off references a balance that changed since signing | hold and re-confirm naming both states |
+| 08.05 | posted remit does not reconcile to the penny | reconciliation.exception to human and 13 - $0.00 tolerance (ratified 2026-07-18); 'close enough' is the named breach |
+| 08.06 | credit balance surfaces at posting | credit.balance to 11, 12, 13; the refund clock arms - a credit held silently is a compliance violation, not a float |
+| 08.07 | refund contemplated for a credit balance | executes only on signed refund.authority; an unsigned refund is an integrity violation like any other money |
+| 08.08 | primary remit posts and a secondary payer is on file | secondary.claim.ready to 07, 13; the cascade is swarm work - the money rules do not relax for it |
 
 ## Agent 09 - denial-management
 Connected playbooks: P05
@@ -108,9 +119,10 @@ Connected playbooks: P05
 | 09.02 | denial reason contradicts the posted auth | package both facts for human; payer errors are argued by humans with the record |
 | 09.03 | appeal deadline passes awaiting human decision | record the miss with its timeline; named in the books, never buried |
 | 09.04 | payer 'reprocessing' claim sits past its promise date | payer.status fact + escalate; a promise is not a payment |
+| 09.05 | human elects to abandon an appeal | closure only on signed appeal.abandon.authority; a denial's ending is signed - decision or write-off - or it has not ended |
 
 ## Agent 10 - ar-followup
-Connected playbooks: P06, P07
+Connected playbooks: P06, P07, P11
 
 | # | Crossing | Predeliberated answer |
 |---|---|---|
@@ -118,9 +130,12 @@ Connected playbooks: P06, P07
 | 10.02 | balance under the small-balance threshold | published rule executes via the policy path; below-threshold is not quietly ignore |
 | 10.03 | published sequence ends unresolved | human with full contact history; the sequence ends in a decision, not an invented next step |
 | 10.04 | patient reply promises payment 'next week' | record verbatim, sequence pauses per rule; a promise pauses per policy, never indefinitely |
+| 10.05 | account reaches the point where referral is contemplated | assemble the full history for the human; movement only on signed collection.referral.authority - the swarm never refers |
+| 10.06 | patient.optout arrives on an account in follow-up | patient-lane contact stops; payer-lane work continues - the opt-out binds the patient lane only |
+| 10.07 | eligibility change lands on an account in A/R | re-anchor follow-up to the corrected coverage facts; the payer conversation cites the change, never argues around it |
 
 ## Agent 11 - patient-billing-records
-Connected playbooks: P04, P07
+Connected playbooks: P04, P07, P13
 
 | # | Crossing | Predeliberated answer |
 |---|---|---|
@@ -128,9 +143,11 @@ Connected playbooks: P04, P07
 | 11.02 | plan request one month beyond published terms | record verbatim, route to human; 'close to policy' is not policy |
 | 11.03 | posted balance changes while a statement is queued | regenerate against the current record |
 | 11.04 | plan payment missed once | published sequence via 10; consequences are the sequence's, never improvised |
+| 11.05 | patient.optout recorded on the account | statements halt beyond legally required notices; each required notice is named as such on the record |
+| 11.06 | credit.balance lands on the ledger | patient-facing record shows the credit and refund status; a patient owed money sees it, always |
 
 ## Agent 12 - compliance-deadlines
-Connected playbooks: P02, P05, P08
+Connected playbooks: P02, P05, P08, P13, P14
 
 | # | Crossing | Predeliberated answer |
 |---|---|---|
@@ -138,9 +155,11 @@ Connected playbooks: P02, P05, P08
 | 12.02 | claim event date disputed | earlier date runs the clock |
 | 12.03 | a miss is certain regardless of action | escalate immediately, quantified; early certainty is compliance |
 | 12.04 | payer announces a rule change not yet ratified into the table | alert human with the delta; the table changes only by ratification |
+| 12.05 | credit.balance received | refund clock armed per regulation (federal 60-day overpayment rule where applicable); lead-time alert, then escalation - this clock is class-1 |
+| 12.06 | records.disclosure.package pending past lead-time | deadline.alert fires; a records-response clock is a clock like any other |
 
 ## Agent 13 - billing-records
-Connected playbooks: none (tuple-layer only)
+Connected playbooks: P11, P14
 
 | # | Crossing | Predeliberated answer |
 |---|---|---|
@@ -148,6 +167,8 @@ Connected playbooks: none (tuple-layer only)
 | 13.02 | request would expose sealed clinical custody | refuse with the seal named; the flag governs regardless of requester |
 | 13.03 | retention rule conflicts with an open appeal or audit | the hold wins; escalate |
 | 13.04 | storage write unconfirmed | not done until re-verified; unconfirmed is reported failed |
+| 13.05 | external records request arrives (payer audit, patient access) | assemble the disclosure inventory - existence, type, date, source only - records.disclosure.package to human and 12; content sealed, release is a human decision |
+| 13.06 | patient.optout received | logged to the account history verbatim with timestamp; the opt-out is a record, not a note |
 
 ## Agent 14 - daily-operations
 Connected playbooks: P08, P09, P10
@@ -158,5 +179,6 @@ Connected playbooks: P08, P09, P10
 | 14.02 | EOD sweep finds an untouched morning item | miss named with its owner; the sweep never reassigns |
 | 14.03 | human unreachable at book time | publish to the queue and hold; books never expire silently |
 | 14.04 | denial volume spikes against baseline | the spike is a named book fact with the payer breakdown; root cause is human territory |
+| 14.05 | agent.status reports a wait past threshold | named in report.package with its age and blocking party; the morning report carries every wait |
 
-Total tuples: 61. Swarm-wide tuples: SWARM.md. Coverage map: TASK_INVENTORY.md.
+Total tuples: 83. Swarm-wide tuples: SWARM.md. Coverage map: TASK_INVENTORY.md.

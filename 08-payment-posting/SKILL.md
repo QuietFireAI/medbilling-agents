@@ -60,6 +60,10 @@ Dispatcher returns an `ack`.
 | OUT | → 12 / 13 | Adjustment and variance records | `adjustment.record` |
 | OUT | → 09 Denial Management | Denials at posting, codes verbatim | `denial.intake` |
 | OUT | → 13 Billing Records | Ambient logging | `interaction.log` |
+| OUT | → human / 13 | Reconciliation variance - $0.00 tolerance, human notified | `reconciliation.exception` |
+| OUT | → 11 / 12 / 13 | Credit balance surfaced; refund clock arms at 12 | `credit.balance` |
+| OUT | → 07 / 13 | Secondary claim cascade after primary remit | `secondary.claim.ready` |
+| IN | ← human | Signed refund authority - refunds are money | `refund.authority` |
 
 This agent has no other edges. If a task appears to require any other
 communication path, that is an ambiguity condition (section 6) - stop and ask

@@ -56,6 +56,7 @@ Dispatcher returns an `ack`.
 | OUT | → human | Morning book / EOD books | `report.package` |
 | OUT | → 13 Billing Records | Record pulls | `record.request` |
 | IN | ← 13 Billing Records | Chronologies, exceptions | `record.response` |
+| IN | ← any | Wait-state visibility - agents report waits past threshold | `agent.status` |
 
 This agent has no other edges. If a task appears to require any other
 communication path, that is an ambiguity condition (section 6) - stop and ask

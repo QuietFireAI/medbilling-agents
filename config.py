@@ -18,7 +18,8 @@ IDENTITY_MD = "IDENTITY-medical-billing-agent.md"
 LAST_AGENT = "14-daily-operations"
 LIC_NOUN = "medical-billing agent"
 CLASSES = {"P01": 2, "P02": 1, "P03": 2, "P04": 2, "P05": 1,
-           "P06": 3, "P07": 2, "P08": 1, "P09": 2, "P10": 2}
+           "P06": 3, "P07": 2, "P08": 1, "P09": 2, "P10": 2,
+           "P11": 2, "P12": 2, "P13": 1, "P14": 2}
 PRIORITY_DOCTRINE = ("JIT run-priority per core doctrine: class 1 = clock-critical "
  "(prior auth blocking care, appeal deadlines, timely filing), class 2 = active "
  "revenue-cycle lifecycle and books, class 3 = aging follow-up. Pacing over "

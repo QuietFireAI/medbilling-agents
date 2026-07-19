@@ -66,6 +66,9 @@ Dispatcher returns an `ack`.
 | IN | ← 09 Denial Management | Triage + appeal packages (audit) | `denial.triage`, `appeal.package` |
 | IN | ← 10 A/R Follow-up | Payer status facts | `payer.status` |
 | IN | ← 11 Patient Billing Records | Statement/payment/plan records | `billing.record` |
+| OUT | → human / 12 | Records disclosure inventory (existence/type/date/source only) for human release decision | `records.disclosure.package` |
+| IN | ← 04 | Patient opt-out logged to the account history | `patient.optout` |
+| IN | ← 08 | Reconciliation variances, credit balances, secondary-cascade records (books copy) | `reconciliation.exception` / `credit.balance` / `secondary.claim.ready` |
 
 This agent has no other edges. If a task appears to require any other
 communication path, that is an ambiguity condition (section 6) - stop and ask

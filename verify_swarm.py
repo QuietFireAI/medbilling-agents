@@ -11,7 +11,7 @@ Checks:
      (from -> intent -> to) tuple must be legal. (The Agent 15 defect class.)
   2. EDGE COMPLETENESS - reverse direction: every sender/receiver ROUTES names
      must DECLARE a matching edge. (The Agent 07 vendor.request defect class.)
-  3. REGRESSION - frontmatter (25 files), playbook intent legality vs ROUTES,
+  3. REGRESSION - frontmatter (29 files), playbook intent legality vs ROUTES,
      envelope JSON parse, required sections.
 
 Exemptions (documented, deliberate):
@@ -110,8 +110,8 @@ def check_regression():
         return ["pyyaml not installed"]
     skill_files = sorted(glob.glob("[0-2][0-9]-*/SKILL.md")) + \
         sorted(glob.glob("playbooks/P*/SKILL.md"))
-    if len(skill_files) != 25:
-        problems.append(f"expected 25 SKILL.md files, found {len(skill_files)}")
+    if len(skill_files) != 29:
+        problems.append(f"expected 29 SKILL.md files, found {len(skill_files)}")
     table_intents = {i for i, *_ in ROUTES}
     for f in skill_files:
         txt = open(f).read()

@@ -18,5 +18,6 @@ constrains everything.
 - (two payers both show active (COB), report both with effective dates; primacy per COB table or human)
 - (portal and 271 disagree on benefits, report both with timestamps; the discrepancy is the fact)
 - (verification requested for a future DOS beyond payer window, report the window limit; never extrapolate coverage forward)
+- (re-verify shows coverage changed on an in-flight claim, eligibility.result to 07 and 10 as well; a mid-cycle change re-opens gates, never rewrites history)
 
 (Root rule, restated: no suitable tuple - or an uncertain match - means STOP and ask the human.)

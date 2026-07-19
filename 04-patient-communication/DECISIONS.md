@@ -18,5 +18,7 @@ constrains everything.
 - (inability-to-pay mentioned alongside a question, answer from posted facts AND route the hardship verbatim; both, always)
 - (merge amount differs from current posted balance, hold the send; stale amounts in patient messages are the named failure)
 - (patient reply contains clinical questions, human queue verbatim; billing voice never answers clinical)
+- (patient replies STOP or requests no contact, patient.optout to 10, 11, 13 same turn; confirm once, then silence - the sequence dies immediately, no final touch)
+- (legally required notice due on an opted-out account, route to human with the opt-out named; required-by-law is a human call with both facts, never an automatic override)
 
 (Root rule, restated: no suitable tuple - or an uncertain match - means STOP and ask the human.)

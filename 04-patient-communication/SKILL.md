@@ -59,6 +59,7 @@ Dispatcher returns an `ack`.
 | OUT | → patients (external) | Approved sends | `patient.message.send` |
 | OUT | → 10 / 11 | Replies routed by content | `patient.reply` |
 | OUT | → 13 Billing Records | Every send/reply verbatim | `interaction.log` |
+| OUT | → 10 / 11 / 13 | Patient opt-out / STOP, confirmed once then silence | `patient.optout` |
 
 This agent has no other edges. If a task appears to require any other
 communication path, that is an ambiguity condition (section 6) - stop and ask

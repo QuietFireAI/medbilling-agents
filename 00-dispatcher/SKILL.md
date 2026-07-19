@@ -96,7 +96,7 @@ communication in that one guarantee.
 | `scrub.result` | 02 | 07, 13 |
 | `scrub.exception` | 02 | human, 13 |
 | `eligibility.request` | 01, 02, 06 | 03 |
-| `eligibility.result` | 03 | 01, 02, 06, 13 |
+| `eligibility.result` | 03 | 01, 02, 06, 07, 10, 13 |
 | `patient.message.request` | 05, 06, 10, 11 | 04 |
 | `patient.message.send` | 04 | external |
 | `patient.reply` | 04 | 10, 11 |
@@ -125,6 +125,15 @@ communication in that one guarantee.
 | `escalation.*` | any | queue |
 | `clarification.request` | any | queue |
 | `integrity.violation` | any | queue |
+| `agent.status` | any | 14 |
+| `reconciliation.exception` | 08 | human, 13 |
+| `credit.balance` | 08 | 11, 12, 13 |
+| `secondary.claim.ready` | 08 | 07, 13 |
+| `refund.authority` | human | 08 |
+| `collection.referral.authority` | human | 10 |
+| `appeal.abandon.authority` | human | 09 |
+| `patient.optout` | 04 | 10, 11, 13 |
+| `records.disclosure.package` | 13 | human, 12 |
 | `config.update` | human | any |
 
 Any (intent, from, to) tuple not in this table is rejected and logged. The table

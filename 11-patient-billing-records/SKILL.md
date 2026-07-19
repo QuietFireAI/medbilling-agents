@@ -62,6 +62,8 @@ Dispatcher returns an `ack`.
 | OUT | → 04 Patient Communication | Statements and plan confirmations | `patient.message.request` |
 | OUT | → 13 Billing Records | Record lookups | `record.request` |
 | IN | ← 13 Billing Records | Record responses | `record.response` |
+| IN | ← 04 | Patient opt-out on the account record | `patient.optout` |
+| IN | ← 08 | Credit balance on the patient ledger | `credit.balance` |
 
 This agent has no other edges. If a task appears to require any other
 communication path, that is an ambiguity condition (section 6) - stop and ask

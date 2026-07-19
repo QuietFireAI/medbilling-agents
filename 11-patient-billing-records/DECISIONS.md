@@ -18,5 +18,7 @@ constrains everything.
 - (plan request one month beyond published terms, record verbatim, route to human; 'close to policy' is not policy)
 - (posted balance changes while a statement is queued, regenerate against the current record)
 - (plan payment missed once, published sequence via 10; consequences are the sequence's, never improvised)
+- (patient.optout recorded on the account, statements halt beyond legally required notices; each required notice is named as such on the record)
+- (credit.balance lands on the ledger, patient-facing record shows the credit and refund status; a patient owed money sees it, always)
 
 (Root rule, restated: no suitable tuple - or an uncertain match - means STOP and ask the human.)

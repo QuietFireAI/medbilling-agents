@@ -18,5 +18,6 @@ constrains everything.
 - (EOD sweep finds an untouched morning item, miss named with its owner; the sweep never reassigns)
 - (human unreachable at book time, publish to the queue and hold; books never expire silently)
 - (denial volume spikes against baseline, the spike is a named book fact with the payer breakdown; root cause is human territory)
+- (agent.status reports a wait past threshold, named in report.package with its age and blocking party; the morning report carries every wait)
 
 (Root rule, restated: no suitable tuple - or an uncertain match - means STOP and ask the human.)

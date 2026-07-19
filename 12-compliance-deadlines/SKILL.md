@@ -60,6 +60,8 @@ Dispatcher returns an `ack`.
 | OUT | → hold queue (via 00) | Rule-violation holds | `compliance.hold` |
 | OUT | → 13 Billing Records | Record lookups | `record.request` |
 | IN | ← 13 Billing Records | Record responses | `record.response` |
+| IN | ← 08 | Credit balance - refund clock armed (60-day overpayment rule) | `credit.balance` |
+| IN | ← 13 | Records disclosure pending - response clock armed | `records.disclosure.package` |
 
 This agent has no other edges. If a task appears to require any other
 communication path, that is an ambiguity condition (section 6) - stop and ask

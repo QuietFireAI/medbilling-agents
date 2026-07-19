@@ -18,5 +18,7 @@ constrains everything.
 - (request would expose sealed clinical custody, refuse with the seal named; the flag governs regardless of requester)
 - (retention rule conflicts with an open appeal or audit, the hold wins; escalate)
 - (storage write unconfirmed, not done until re-verified; unconfirmed is reported failed)
+- (external records request arrives (payer audit, patient access), assemble the disclosure inventory - existence, type, date, source only - records.disclosure.package to human and 12; content sealed, release is a human decision)
+- (patient.optout received, logged to the account history verbatim with timestamp; the opt-out is a record, not a note)
 
 (Root rule, restated: no suitable tuple - or an uncertain match - means STOP and ask the human.)

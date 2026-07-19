@@ -8,7 +8,7 @@ defect, not a change.
 
 ## Manifest (generated)
 - Agents: 15 (00-dispatcher + 14 spokes)
-- Routes: 35 entries, 35 distinct intents
+- Routes: 44 entries, 44 distinct intents
 - Playbooks: P01-P10 (playbooks/)
 - Layer stack: MANNERS.md → DISPATCHER_CORE.md → identity/ → DECISIONS.md
   (per agent) → playbooks/ → agent SKILL.md files
@@ -50,7 +50,7 @@ defect, not a change.
 - 12 Compliance & Deadlines Agent
 - 13 Billing Records Agent
 - 14 Daily Operations Agent
-- Intents: `adjustment.record`, `appeal.package`, `auth.package`, `auth.request`, `auth.status`, `billing.record`, `claim.status`, `claim.submit`, `clarification.request`, `compliance.hold`, `config.update`, `deadline.alert`, `denial.intake`, `denial.triage`, `doc.received`, `doc.request`, `eligibility.request`, `eligibility.result`, `encounter.captured`, `escalation.*`, `integrity.violation`, `interaction.log`, `patient.message.request`, `patient.message.send`, `patient.reply`, `payer.status`, `plan.authority`, `record.request`, `record.response`, `rejection.notice`, `remit.posted`, `report.package`, `scrub.exception`, `scrub.result`, `writeoff.authority`
+- Intents: `adjustment.record`, `agent.status`, `appeal.abandon.authority`, `appeal.package`, `auth.package`, `auth.request`, `auth.status`, `billing.record`, `claim.status`, `claim.submit`, `clarification.request`, `collection.referral.authority`, `compliance.hold`, `config.update`, `credit.balance`, `deadline.alert`, `denial.intake`, `denial.triage`, `doc.received`, `doc.request`, `eligibility.request`, `eligibility.result`, `encounter.captured`, `escalation.*`, `integrity.violation`, `interaction.log`, `patient.message.request`, `patient.message.send`, `patient.optout`, `patient.reply`, `payer.status`, `plan.authority`, `reconciliation.exception`, `record.request`, `record.response`, `records.disclosure.package`, `refund.authority`, `rejection.notice`, `remit.posted`, `report.package`, `scrub.exception`, `scrub.result`, `secondary.claim.ready`, `writeoff.authority`
 
 ## Swarm-level decision tuples (predictable scenarios, pre-deliberated)
 - (two playbooks match one trigger, run neither; clarification.request naming both)

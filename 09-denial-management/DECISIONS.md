@@ -18,5 +18,6 @@ constrains everything.
 - (denial reason contradicts the posted auth, package both facts for human; payer errors are argued by humans with the record)
 - (appeal deadline passes awaiting human decision, record the miss with its timeline; named in the books, never buried)
 - (payer 'reprocessing' claim sits past its promise date, payer.status fact + escalate; a promise is not a payment)
+- (human elects to abandon an appeal, closure only on signed appeal.abandon.authority; a denial's ending is signed - decision or write-off - or it has not ended)
 
 (Root rule, restated: no suitable tuple - or an uncertain match - means STOP and ask the human.)

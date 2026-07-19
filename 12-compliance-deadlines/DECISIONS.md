@@ -18,5 +18,7 @@ constrains everything.
 - (claim event date disputed, earlier date runs the clock)
 - (a miss is certain regardless of action, escalate immediately, quantified; early certainty is compliance)
 - (payer announces a rule change not yet ratified into the table, alert human with the delta; the table changes only by ratification)
+- (credit.balance received, refund clock armed per regulation (federal 60-day overpayment rule where applicable); lead-time alert, then escalation - this clock is class-1)
+- (records.disclosure.package pending past lead-time, deadline.alert fires; a records-response clock is a clock like any other)
 
 (Root rule, restated: no suitable tuple - or an uncertain match - means STOP and ask the human.)

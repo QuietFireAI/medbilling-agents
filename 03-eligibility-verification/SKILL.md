@@ -56,6 +56,7 @@ Dispatcher returns an `ack`.
 |---|---|---|---|
 | IN | ← 01 / 02 / 06 | Eligibility lookups | `eligibility.request` |
 | OUT | → 01 / 02 / 06 / 13 | Coverage facts with timestamps | `eligibility.result` |
+| OUT | → 07 / 10 | Coverage change on in-flight claims (mid-cycle re-verify) | `eligibility.result` |
 
 This agent has no other edges. If a task appears to require any other
 communication path, that is an ambiguity condition (section 6) - stop and ask

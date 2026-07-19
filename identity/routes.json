@@ -1,5 +1,5 @@
 {
- "version": "0.1",
+ "version": "0.2",
  "vertical": "medical-billing-agent",
  "routes": [
   {
@@ -61,6 +61,8 @@
     "01",
     "02",
     "06",
+    "07",
+    "10",
     "13"
    ]
   },
@@ -363,6 +365,94 @@
    ],
    "receivers": [
     "queue"
+   ]
+  },
+  {
+   "intent": "agent.status",
+   "senders": [
+    "any"
+   ],
+   "receivers": [
+    "14"
+   ]
+  },
+  {
+   "intent": "reconciliation.exception",
+   "senders": [
+    "08"
+   ],
+   "receivers": [
+    "human",
+    "13"
+   ]
+  },
+  {
+   "intent": "credit.balance",
+   "senders": [
+    "08"
+   ],
+   "receivers": [
+    "11",
+    "12",
+    "13"
+   ]
+  },
+  {
+   "intent": "secondary.claim.ready",
+   "senders": [
+    "08"
+   ],
+   "receivers": [
+    "07",
+    "13"
+   ]
+  },
+  {
+   "intent": "refund.authority",
+   "senders": [
+    "human"
+   ],
+   "receivers": [
+    "08"
+   ]
+  },
+  {
+   "intent": "collection.referral.authority",
+   "senders": [
+    "human"
+   ],
+   "receivers": [
+    "10"
+   ]
+  },
+  {
+   "intent": "appeal.abandon.authority",
+   "senders": [
+    "human"
+   ],
+   "receivers": [
+    "09"
+   ]
+  },
+  {
+   "intent": "patient.optout",
+   "senders": [
+    "04"
+   ],
+   "receivers": [
+    "10",
+    "11",
+    "13"
+   ]
+  },
+  {
+   "intent": "records.disclosure.package",
+   "senders": [
+    "13"
+   ],
+   "receivers": [
+    "human",
+    "12"
    ]
   },
   {

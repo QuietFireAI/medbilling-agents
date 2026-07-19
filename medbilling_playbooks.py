@@ -189,4 +189,88 @@ PB = [
   gates=["The sweep never reassigns - it names. Reassignment is the human's morning decision."],
   completion="EOD books delivered; sweep complete with owners named; completion event logged.",
   abort=["Morning baseline absent: the sweep names that first and proceeds on records alone."]),
+
+ dict(num="P11", slug="eligibility-change-midcycle", name="Eligibility Change Mid-Cycle",
+  desc="Swarm deployment: detected coverage change to re-opened gates on every affected claim. Agents 03, 07, 10, 02, 13. A coverage change re-opens gates going forward - it never rewrites posted history.",
+  trigger="`eligibility.result` at 03 (re-verify or payer notice) differing from the coverage facts a claim was gated on.",
+  pre=["The prior eligibility facts are on record with timestamps - a change is only a change against a recorded baseline."],
+  phases=[
+   ("Phase 1 - Blast radius", [
+    ("1","03","Report the change with both fact sets and timestamps","`eligibility.result` \u2192 02, 07, 10, 13","old and new coverage facts on record"),
+    ("2","13","Return every claim gated on the prior facts","`record.response` \u2192 07, 10","affected-claim list with gate citations"),
+   ]),
+   ("Phase 2 - Re-gate", [
+    ("3","07","Hold unsubmitted affected claims at the gate","(hold; `agent.status` \u2192 14 while waiting)","held claims named with reason"),
+    ("4","02","Re-scrub held claims against corrected coverage","`scrub.result` \u2192 07, 13","fresh gate state per claim"),
+    ("5","10","Re-anchor in-flight follow-up to corrected facts","`payer.status` \u2192 12, 13","follow-up record cites the change"),
+   ]),
+  ],
+  gates=["No affected claim submits on the stale gate - re-verification precedes release, every time.",
+         "Posted history is never edited to match new coverage - the change is recorded forward only."],
+  completion="Every affected claim either re-gated green on corrected facts or held with its reason named; the change and its blast radius on record.",
+  abort=["Payer systems down for re-verify: affected claims hold; the outage is named (03's outage tuple governs).",
+         "Change implies retroactive termination: human notified with the full record - retro-term disputes are human/payer conversations."]),
+
+ dict(num="P12", slug="secondary-claim-cascade", name="Secondary Claim Cascade",
+  desc="Swarm deployment: primary remit posted to secondary claim submitted through full gates. Agents 08, 07, 02, 03, 13. A cascade is a claim, not a shortcut - every gate applies again.",
+  trigger="`secondary.claim.ready` at 07: primary remit posted (08) with a secondary payer on file.",
+  pre=["Primary remit posted with adjustments applied per loaded contract rules (or held unapplied per 08's unruled tuple).",
+       "Secondary payer on file from eligibility/COB facts, not assumption."],
+  phases=[
+   ("Phase 1 - Assemble", [
+    ("1","08","Package primary payment facts verbatim (paid, adjusted, patient responsibility)","`secondary.claim.ready` \u2192 07, 13","primary EOB facts attached verbatim"),
+    ("2","03","Confirm secondary coverage active on DOS","`eligibility.result` \u2192 07, 13","secondary coverage facts with timestamps"),
+   ]),
+   ("Phase 2 - Gate and submit", [
+    ("3","02","Fresh scrub with COB edits","`scrub.result` \u2192 07, 13","gate-green with edit-table version"),
+    ("4","07","Submit; both acceptance artifacts confirmed","`claim.submit` \u2192 external; `claim.status` \u2192 10, 13","clearinghouse AND payer ack on record"),
+   ]),
+  ],
+  gates=["The secondary claim passes the same scrub and eligibility gates as any claim - no gate is waived for a cascade.",
+         "Primary payment facts move verbatim - never recomputed, never adjusted in transit."],
+  completion="Secondary claim submitted with both acceptance artifacts, primary facts verbatim, gates cited; or held with its blocking gate named.",
+  abort=["Secondary coverage cannot be confirmed: claim holds; unknown blocks gates (identity rule).",
+         "Timely-filing clock on the secondary at risk: P08 doctrine takes over - escalate at lead-time."]),
+
+ dict(num="P13", slug="credit-balance-refund", name="Credit Balance & Refund Compliance",
+  desc="Swarm deployment: surfaced credit balance to signed, executed refund inside the regulatory clock. Agents 08, 12, 11, 04, 13. Class 1: the federal 60-day overpayment rule is a filing clock with penalties.",
+  trigger="`credit.balance` at 12 (and 11, 13) from posting.",
+  pre=["The credit is computed from posted remits and payments on record - a suspected credit without posted support routes to human as a question, not a credit."],
+  phases=[
+   ("Phase 1 - Clock and visibility", [
+    ("1","12","Arm the refund clock per regulation (60-day rule where applicable); lead-time alerts set","`deadline.alert` \u2192 10, 14 (at lead-times)","clock live with regulatory citation"),
+    ("2","11","Post the credit to the patient-facing ledger with refund status","`billing.record` \u2192 13","credit visible on the account"),
+   ]),
+   ("Phase 2 - Human decision and execution", [
+    ("3","08","Package the credit: source remits, payments, computed amount, payee determination facts","`reconciliation.exception` \u2192 human, 13","package delivered inside lead-time"),
+    ("4","08","Execute the refund on signed authority only","(await `refund.authority` \u2190 human)","signed envelope on the chain before any money moves"),
+    ("5","04","Notify the patient from posted facts once executed","`patient.message.send` \u2192 external","templated notice, posted-facts only"),
+   ]),
+  ],
+  gates=["No refund executes unsigned - `refund.authority` is money, same doctrine as write-offs.",
+         "The clock never slips silently: lead-time alert, then escalation before the 60-day line, every time."],
+  completion="Refund executed on signed authority inside the clock, patient notified, books reconciled to $0.00 variance; or the miss escalated before it lands.",
+  abort=["Payee ambiguous (patient vs payer vs unclaimed-property): human decision with both determinations packaged - the swarm never picks a payee.",
+         "Signed authority not received at escalation threshold: certain-miss escalation fires; the miss is named in the books (P08 doctrine)."]),
+
+ dict(num="P14", slug="records-request-response", name="Records Request Response",
+  desc="Swarm deployment: external records request to human-approved disclosure inside the response clock. Agents 13, 12, 05, 04, 10. Sealed custody end to end - the swarm inventories existence, a human approves every release.",
+  trigger="External records request lands: payer audit via 10, patient access request via 04.",
+  pre=["The request is captured verbatim with its date, requester, scope, and stated deadline (or the regulatory default)."],
+  phases=[
+   ("Phase 1 - Clock and inventory", [
+    ("1","12","Arm the response clock (regulatory default if none stated)","`deadline.alert` \u2192 10, 14 (at lead-times)","clock live"),
+    ("2","13","Assemble the disclosure inventory: existence, type, date, source per item - content sealed","`records.disclosure.package` \u2192 human, 12","inventory delivered inside lead-time"),
+    ("3","05","Flag any inventoried item in sealed clinical custody","`doc.received` \u2192 13 (custody references)","custody status per item"),
+   ]),
+   ("Phase 2 - Human release", [
+    ("4","13","Record the human's release decision and what was disclosed","`record.response` + `interaction.log`","disclosure record: who, what, when, under whose approval"),
+    ("5","04/10","Transmit per the human's approved scope (patient lane via 04, payer lane via 10)","`patient.message.send` / `payer.status`","transmission artifact on record"),
+   ]),
+  ],
+  gates=["No content is read, summarized, or released by the swarm - inventory is existence/type/date/source only; release is human-approved, itemized, and logged.",
+         "Scope discipline: nothing beyond the approved item list transmits - HIPAA minimum necessary is the ceiling, not a suggestion."],
+  completion="Human-approved disclosure transmitted inside the clock with a complete itemized record; or refusal/clarification recorded the same way.",
+  abort=["Request scope ambiguous or overbroad: clarification to human before any inventory work product leaves the swarm.",
+         "Misdirected or wrong-patient material discovered during inventory: 05's sealed-misdirect protocol - human immediately, HIPAA incident logged."]),
 ]

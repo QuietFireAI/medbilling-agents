@@ -1,5 +1,5 @@
 {
- "_status": "UNRATIFIED TEMPLATE - owner must edit, ratify (date + sign-off), then load; loads fail closed while this line stands",
+ "_status": "DOCTRINE RATIFIED 2026-07-18 (owner: Jeff Phillips); payer entries are deployment content - an empty table is fail-closed by structure (nothing matches, so nothing auto-posts)",
  "_table": "contract_rules",
  "_purpose": "Payer contract adjustment rules 08 may cite",
  "_fields": [
@@ -15,5 +15,6 @@
    "rule": "<example>",
    "rate_basis": "<example>"
   }
- ]
+ ],
+ "_doctrine": "ZERO-THRESHOLD RULE (ratified 2026-07-18, permeates all identity blueprints): adjustments matching a loaded payer-contract rule post automatically with the rule citation; ANY other adjustment, ANY amount, moves only on signed human authority. There is no dollar threshold, no 'auto under $X', no de-minimis lane. Reconciliation tolerance is $0.00 - any variance is reconciliation.exception to the human and the books; 'close enough' is the named breach."
 }

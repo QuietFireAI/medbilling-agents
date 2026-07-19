@@ -1,5 +1,5 @@
 {
- "_status": "UNRATIFIED TEMPLATE - owner must edit, ratify (date + sign-off), then load; loads fail closed while this line stands",
+ "_status": "RATIFIED 2026-07-18 (owner: Jeff Phillips) - approved as written",
  "_table": "contact_sequence",
  "_purpose": "Published patient-contact sequence with ceiling",
  "_fields": [
@@ -15,5 +15,44 @@
    "offset_days": "<example>",
    "ceiling": "<example>"
   }
- ]
+ ],
+ "sequence": [
+  {
+   "day": 0,
+   "step": "statement",
+   "channel": "mail/portal",
+   "template": "statement"
+  },
+  {
+   "day": 30,
+   "step": "reminder_1",
+   "channel": "per patient preference",
+   "template": "reminder"
+  },
+  {
+   "day": 60,
+   "step": "reminder_2",
+   "channel": "per patient preference",
+   "template": "reminder"
+  },
+  {
+   "day": 90,
+   "step": "final_notice",
+   "channel": "mail",
+   "template": "final_notice"
+  },
+  {
+   "after": "final_notice",
+   "step": "human_decision",
+   "rule": "NEVER auto-referral - settlement, hardship, and collection referral are human decisions carrying the full history (identity absolute line 4); referral moves only on signed collection.referral.authority"
+  }
+ ],
+ "constraints": {
+  "contact_window_local": "08:00-21:00",
+  "no_contact_days": [
+   "Sunday"
+  ],
+  "max_touches": "1 per 25 days per balance",
+  "optout": "patient.optout kills the sequence immediately; one confirmation, then silence; legally required notices route to human with the opt-out named"
+ }
 }

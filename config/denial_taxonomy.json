@@ -1,5 +1,5 @@
 {
- "_status": "UNRATIFIED TEMPLATE - owner must edit, ratify (date + sign-off), then load; loads fail closed while this line stands",
+ "_status": "ROUTING DOCTRINE RATIFIED 2026-07-18 (owner: Jeff Phillips); category entries are deployment content refined against real payer mix",
  "_table": "denial_taxonomy",
  "_purpose": "Ratified denial triage categories",
  "_fields": [
@@ -13,5 +13,6 @@
    "clock_basis": "<example>",
    "path": "<example>"
   }
- ]
+ ],
+ "_doctrine": "TWO-LANE TRIAGE (ratified 2026-07-18): technical/administrative denials (missing info, COB, timely-filing risk, demographic/format) -> swarm rework path through fresh scrub; medical-necessity, coding, and clinical denials -> straight to the certified human, the swarm only assembles the packet (denial verbatim, claim history, sealed doc references). Ties triage to the shorter appeal clock (09's conservatism tuple)."
 }

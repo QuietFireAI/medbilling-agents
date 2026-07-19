@@ -1,5 +1,5 @@
 {
- "_status": "RATIFIED 2026-07-11 - owner sign-off, approved as written",
+ "_status": "RATIFIED 2026-07-11 - owner sign-off, approved as written; P11-P14 classes added and ratified 2026-07-18 (owner: Jeff Phillips) - P13 class 1: the federal 60-day overpayment rule is a clock with penalties",
  "_doctrine": "JIT run-priority per core doctrine: class 1 = clock-critical (prior auth blocking care, appeal deadlines, timely filing), class 2 = active revenue-cycle lifecycle and books, class 3 = aging follow-up. Pacing over braking: the siding scheduler paces class contention; nothing slam-stops.",
  "classes": {
   "P01": 2,
@@ -11,6 +11,10 @@
   "P07": 2,
   "P08": 1,
   "P09": 2,
-  "P10": 2
+  "P10": 2,
+  "P11": 2,
+  "P12": 2,
+  "P13": 1,
+  "P14": 2
  }
 }

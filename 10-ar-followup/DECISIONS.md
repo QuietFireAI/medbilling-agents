@@ -18,5 +18,8 @@ constrains everything.
 - (balance under the small-balance threshold, published rule executes via the policy path; below-threshold is not quietly ignore)
 - (published sequence ends unresolved, human with full contact history; the sequence ends in a decision, not an invented next step)
 - (patient reply promises payment 'next week', record verbatim, sequence pauses per rule; a promise pauses per policy, never indefinitely)
+- (account reaches the point where referral is contemplated, assemble the full history for the human; movement only on signed collection.referral.authority - the swarm never refers)
+- (patient.optout arrives on an account in follow-up, patient-lane contact stops; payer-lane work continues - the opt-out binds the patient lane only)
+- (eligibility change lands on an account in A/R, re-anchor follow-up to the corrected coverage facts; the payer conversation cites the change, never argues around it)
 
 (Root rule, restated: no suitable tuple - or an uncertain match - means STOP and ask the human.)
