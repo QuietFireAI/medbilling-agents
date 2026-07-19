@@ -1,5 +1,5 @@
 {
- "_status": "UNRATIFIED TEMPLATE - owner must edit, ratify (date + sign-off), then load; loads fail closed while this line stands",
+ "_status": "UNRATIFIED TEMPLATE - owner must edit, ratify (date + sign-off), then load; loads fail closed while this line stands | ALL TEMPLATES RATIFIED Jeff Phillips 2026-07-18 (owner blanket sign-off, Section B decision)",
  "_table": "message_templates",
  "_purpose": "Approved patient communication templates",
  "_fields": [
@@ -19,7 +19,7 @@
    "template_id": "opt_out_confirmed",
    "purpose": "One-time confirmation after patient.optout; then silence",
    "body": "We've received your request and will stop billing reminders to this contact. Any legally required notices will still be sent. Questions: call the office.",
-   "approved_by": "<owner name/date>"
+   "approved_by": "Jeff Phillips 2026-07-18"
   }
  ]
 }
