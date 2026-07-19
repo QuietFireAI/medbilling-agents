@@ -78,3 +78,21 @@ priority table's status on every load - never silently.
 ## License
 
 Proprietary - see LICENSE (placeholder pending legal review).
+
+## See it work (2 minutes)
+
+```
+pip install -r requirements.txt
+python3 tools/run_demo.py            # one patient, six acts, real hub
+python -m pytest tests_medbilling/   # every playbook P01-P14, every gate
+```
+
+The demo runs a real encounter to a gate-green claim, submission with
+both acceptance artifacts, a remit with a one-cent variance (caught), a
+medical-necessity denial (routed to the human, never argued), a credit
+balance with the 60-day clock armed, an UNSIGNED refund (rejected by the
+hub) then a signed one (executed), a patient STOP (sequence dead same
+turn), and finishes by verifying the hash chain. docs/START_HERE.md is
+the 60-second tour; docs/OPERATOR_TESTING_MANUAL.md is the filmable
+script including the adversarial tests.
+

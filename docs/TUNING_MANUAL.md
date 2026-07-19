@@ -18,7 +18,7 @@ listed here. If it's not in this table it's ratified content or real spec.
 | Denial category entries | `config/denial_taxonomy.json` | **DOCTRINE RATIFIED / entries deployment content** | Two-lane triage doctrine binding; refine categories against your real payer mix. |
 | Payer rule table / edit tables | `config/payer_rule_table.json`, `config/edit_tables.json` | **DEPLOYMENT CONTENT** | Owner-ratified versions required before P01 runs; the version at scrub-open governs each claim. |
 | Message templates | `config/message_templates.json` | **UNRATIFIED — awaiting owner sign-off per template** | Fill `approved_by` name/date per template to ratify wording. |
-| Runtime | whole repo | **BLUEPRINT, not runtime-hardened** | This identity side-loads into the dispatcher-agents runtime; no working build exists yet (owner decision 2026-07-18, Option A). |
+| Runtime | `dispatcher/` + `tests_medbilling/` | **WORKING BUILD (2026-07-18)** | Vendored dispatcher core + 14 real spokes; 24-test e2e suite covers every playbook P01-P14 and every absolute line; `tools/run_demo.py` runs one patient end to end. Exhaustive per-tuple coverage at listing-agents depth is the next pass - playbook paths and hard gates are implemented, the long tail of DECISIONS.md tuples is tracked, not pretended. |
 
 ---
 
