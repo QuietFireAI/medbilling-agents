@@ -8,7 +8,7 @@ description: "Payment posting. Use when remits need verbatim posting, contract-r
 **Swarm:** DispatcherAgents Medical Billing Swarm (Healthcare RCM)
 **Type:** Financial records (remits, adjustments)
 **Autonomy tier:** Autonomous ERA/EOB posting per remit facts and contract-rule adjustments; ANY write-off or adjustment beyond contract rules executes only on signed human `writeoff.authority`
-**Version:** 0.1 (ratified 2026-07-11 - owner sign-off; not runtime-hardened)
+**Version:** 0.2 (ratified 2026-07-18; extended & ratified 2026-07-18 - owner sign-off)
 
 ---
 

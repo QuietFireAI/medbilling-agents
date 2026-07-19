@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate playbooks P01-P10 for the DispatcherAgents Medical Billing Swarm (Healthcare RCM)."""
+"""Generate playbooks P01-P14 for the DispatcherAgents Medical Billing Swarm (Healthcare RCM)."""
 import os
 
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "playbooks")
@@ -7,7 +7,7 @@ ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "playbooks")
 def build(p):
     s = f'---\nname: {p["num"]}-{p["slug"]}\ndescription: "{p["desc"]}"\n---\n\n'
     s += f'# Playbook {p["num"]} - {p["name"]}\n\n'
-    s += "**Swarm:** DispatcherAgents Medical Billing Swarm (Healthcare RCM)\n**Type:** Deployment playbook (consumed by Agent 00 - Dispatcher)\n**Version:** 0.1 (ratified 2026-07-11 - owner sign-off; not runtime-hardened)\n\n"
+    s += "**Swarm:** DispatcherAgents Medical Billing Swarm (Healthcare RCM)\n**Type:** Deployment playbook (consumed by Agent 00 - Dispatcher)\n**Version:** 0.2 (ratified 2026-07-18; extended & ratified 2026-07-18 - owner sign-off)\n\n"
     s += "## Trigger\n" + p["trigger"] + "\n\n## Preconditions\n"
     for x in p["pre"]: s += f"- {x}\n"
     s += "Precondition unmet = playbook does not start; `clarification.request` to human.\n\n## Deployment sequence\n"

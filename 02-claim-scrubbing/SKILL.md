@@ -8,7 +8,7 @@ description: "Claim scrubbing. Use when encounters need edit-table checks before
 **Swarm:** DispatcherAgents Medical Billing Swarm (Healthcare RCM)
 **Type:** Rules engine (claim edits)
 **Autonomy tier:** Autonomous rule-table edits (format, completeness, payer-specific requirements); ANY edit requiring coding judgment routes to the certified human - the scrubber checks rules, it never practices coding
-**Version:** 0.1 (ratified 2026-07-11 - owner sign-off; not runtime-hardened)
+**Version:** 0.2 (ratified 2026-07-18; extended & ratified 2026-07-18 - owner sign-off)
 
 ---
 

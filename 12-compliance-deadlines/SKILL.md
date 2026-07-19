@@ -8,7 +8,7 @@ description: "Compliance and deadlines. Use when timely-filing, appeal, and auth
 **Swarm:** DispatcherAgents Medical Billing Swarm (Healthcare RCM)
 **Type:** Regulatory engine (filing clocks, payer rules)
 **Autonomy tier:** Autonomous clock tracking and alerting; payer rule-table changes and any external response are human-ratified/signed
-**Version:** 0.1 (ratified 2026-07-11 - owner sign-off; not runtime-hardened)
+**Version:** 0.2 (ratified 2026-07-18; extended & ratified 2026-07-18 - owner sign-off)
 
 ---
 

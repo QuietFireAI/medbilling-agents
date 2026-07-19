@@ -8,7 +8,7 @@ description: "Billing records. Use when interactions need the append-only billin
 **Swarm:** DispatcherAgents Medical Billing Swarm (Healthcare RCM)
 **Type:** System of record (billing file, audit)
 **Autonomy tier:** Autonomous record keeping; the record is append-only - corrections are new entries referencing what they correct; clinical custody flags are absolute (HIPAA)
-**Version:** 0.1 (ratified 2026-07-11 - owner sign-off; not runtime-hardened)
+**Version:** 0.2 (ratified 2026-07-18; extended & ratified 2026-07-18 - owner sign-off)
 
 ---
 

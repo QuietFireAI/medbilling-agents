@@ -7,7 +7,7 @@ description: "Swarm deployment: posted denial to human-decided appeal with a com
 
 **Swarm:** DispatcherAgents Medical Billing Swarm (Healthcare RCM)
 **Type:** Deployment playbook (consumed by Agent 00 - Dispatcher)
-**Version:** 0.1 (ratified 2026-07-11 - owner sign-off; not runtime-hardened)
+**Version:** 0.2 (ratified 2026-07-18; extended & ratified 2026-07-18 - owner sign-off)
 
 ## Trigger
 `denial.intake` at 09.

@@ -228,7 +228,7 @@ def build(a):
     s += f"**Swarm:** DispatcherAgents Medical Billing Swarm (Healthcare RCM)\n"
     s += f"**Type:** {a['type']}\n"
     s += f"**Autonomy tier:** {a['autonomy']}\n"
-    s += "**Version:** 0.1 (ratified 2026-07-11 - owner sign-off; not runtime-hardened)\n\n---\n\n"
+    s += "**Version:** 0.2 (ratified 2026-07-18; extended & ratified 2026-07-18 - owner sign-off)\n\n---\n\n"
     s += "## 1. Role\n\n" + a['role'].strip() + "\n\n"
     s += "## 2. Job Components\n\n"
     for j in a['jobs']:
@@ -250,7 +250,7 @@ DISPATCHER = frontmatter("00", "dispatcher") + """# Agent 00 - Dispatcher
 **Swarm:** DispatcherAgents Medical Billing Swarm (Healthcare RCM)
 **Type:** Hub / router / single point of control (and of failure - by design)
 **Autonomy tier:** Full autonomy over routing mechanics; ZERO autonomy over content - the Dispatcher answers no client-facing question itself, ever
-**Version:** 0.1 (ratified 2026-07-11 - owner sign-off; not runtime-hardened)
+**Version:** 0.2 (ratified 2026-07-18; extended & ratified 2026-07-18 - owner sign-off)
 
 ---
 

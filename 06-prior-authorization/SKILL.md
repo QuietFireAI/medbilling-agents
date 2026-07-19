@@ -8,7 +8,7 @@ description: "Prior authorization. Use when auth requirements need rule-table de
 **Swarm:** DispatcherAgents Medical Billing Swarm (Healthcare RCM)
 **Type:** Coordination (auth lifecycle)
 **Autonomy tier:** Autonomous auth-requirement checks, package assembly, submission tracking, and status reporting; clinical attestations and peer-to-peer scheduling are human - the swarm never states medical necessity
-**Version:** 0.1 (ratified 2026-07-11 - owner sign-off; not runtime-hardened)
+**Version:** 0.2 (ratified 2026-07-18; extended & ratified 2026-07-18 - owner sign-off)
 
 ---
 

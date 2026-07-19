@@ -1,4 +1,4 @@
-# DispatcherAgents Medical Billing Swarm (Healthcare RCM) - Roster v0.1 (ratified 2026-07-11 - owner sign-off)
+# DispatcherAgents Medical Billing Swarm (Healthcare RCM) - Roster v0.2 (ratified 2026-07-18 - owner sign-off)
 
 15 agents, hub-and-spoke via 00. All inter-agent communication is a logged
 envelope through the Dispatcher; the route-space is closed (identity/routes.json).

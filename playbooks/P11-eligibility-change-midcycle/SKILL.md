@@ -7,7 +7,7 @@ description: "Swarm deployment: detected coverage change to re-opened gates on e
 
 **Swarm:** DispatcherAgents Medical Billing Swarm (Healthcare RCM)
 **Type:** Deployment playbook (consumed by Agent 00 - Dispatcher)
-**Version:** 0.1 (ratified 2026-07-11 - owner sign-off; not runtime-hardened)
+**Version:** 0.2 (ratified 2026-07-18; extended & ratified 2026-07-18 - owner sign-off)
 
 ## Trigger
 `eligibility.result` at 03 (re-verify or payer notice) differing from the coverage facts a claim was gated on.
