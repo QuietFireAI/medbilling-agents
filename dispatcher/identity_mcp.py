@@ -60,8 +60,6 @@ def _boot_conformance():
     # 1. Closed track loads and is non-empty.
     try:
         routes = Routes(ROUTES_PATH)
-        legal = routes.tuple_legal("01", "encounter.captured", "02") \
-            if IDENTITY_NAME.startswith("medbilling") else None
     except Exception as e:  # noqa: BLE001
         raise ConformanceError(f"closed track failed to load: {e}")
     n_routes = len(json.load(open(ROUTES_PATH))["routes"])
@@ -118,28 +116,27 @@ class GovernedIdentity:
         self._wire_spokes()
         self.hub.on_turn_start()
 
+    # Spoke modules known to this wrapper, by detection (not by folder name).
+    KNOWN = {"medbilling_spokes": "_wire_medbilling"}
+
     def _wire_spokes(self):
-        """Mount the identity's real spokes if a spoke module exists.
-        Absence is honest: describe/audit still work; submit reports the
-        identity is spec-only."""
+        """Mount real spokes by DETECTING which spoke module is present in
+        dispatcher/ - never by directory name (fork-safe). Absence is
+        honest: describe/audit still work; submit reports spec-only."""
         self.spokes = {}
-        try:
-            mod = __import__(
-                f"dispatcher.{IDENTITY_NAME.replace('-', '_').split('_agents')[0]}_spokes",
-                fromlist=["*"])
-        except Exception:
-            try:
-                mod = __import__("dispatcher.medbilling_spokes",
-                                 fromlist=["*"]) \
-                    if IDENTITY_NAME.startswith("medbilling") else None
-            except Exception:
-                mod = None
-        self.spoke_mod = mod
-        if mod is None:
-            return
-        # medbilling wiring (the reference build)
-        if IDENTITY_NAME.startswith("medbilling"):
-            self._wire_medbilling(mod)
+        self.spoke_mod = None
+        import glob
+        disp = os.path.join(ROOT, "dispatcher")
+        for path in glob.glob(os.path.join(disp, "*_spokes.py")):
+            name = os.path.basename(path)[:-3]  # e.g. medbilling_spokes
+            if name in self.KNOWN:
+                try:
+                    mod = __import__(f"dispatcher.{name}", fromlist=["*"])
+                except Exception:
+                    continue
+                self.spoke_mod = mod
+                getattr(self, self.KNOWN[name])(mod)
+                return
 
     def _wire_medbilling(self, m):
         seq = [{"day": 0, "step": "statement", "template": "statement"},
@@ -213,7 +210,9 @@ class GovernedIdentity:
     def _drive(self, intent, payload, ctx):
         """Map a small set of front-door intents to the identity's real
         entry points. Anything not a legal front-door op is refused."""
-        if IDENTITY_NAME.startswith("medbilling"):
+        modname = getattr(self.spoke_mod, "__name__", "") if self.spoke_mod \
+            else ""
+        if modname.endswith("medbilling_spokes"):
             if intent == "encounter.capture":
                 self.spokes["03"].db[ctx] = {"status":
                                              payload.get("eligibility",
