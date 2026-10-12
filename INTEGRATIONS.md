@@ -29,6 +29,23 @@ deployment-site property.
 
 ## Seams
 
+<!-- diagram:integrations-seams - drawn by tools/gen_diagrams.py; edit the generator, not here -->
+```mermaid
+flowchart LR
+    H{{"Hub and agents"}}
+    N0["EHR / charge feed<br/>(sealed)"] -- "encounter.captured intake" --> H
+    H <-- "claim.submit, claim.status, remits" --> N1["Clearinghouse (837 out / 277 / 835 in)"]
+    H <-- "eligibility.request/result" --> N2["Payer eligibility (270/271)"]
+    H <-- "auth tracking + payer.status facts" --> N3["Payer portals (auth/status)"]
+    H -- "statement sends via 04's lane" --> N4["Patient statement/print vendor"]
+    N5["Lockbox/bank posting feed"] -- "patient payment facts to 11" --> H
+    classDef hub fill:#1f6feb,stroke:#1f6feb,color:#ffffff
+    class H hub
+```
+
+*Every seam connects through an adapter that presents to the hub as a registered endpoint. No adapter code ships in this repo.*
+<!-- /diagram:integrations-seams -->
+
 | Seam | Direction | Serves | Required artifact | Sealed | Idempotency key |
 |---|---|---|---|---|---|
 | EHR / charge feed | IN | encounter.captured intake | n/a (provider-entered, provenance per field) | YES | encounter ID |

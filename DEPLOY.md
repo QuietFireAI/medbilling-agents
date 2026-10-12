@@ -29,6 +29,19 @@ closed at load.
 
 ## Go-live doctrine: shadow mode first
 
+<!-- diagram:deploy-go-live-doctrine-shadow-mode-f - drawn by tools/gen_diagrams.py; edit the generator, not here -->
+```mermaid
+flowchart LR
+    D["1 Dark run<br/>read-only inbound,<br/>every outbound seam off"] --> C["2 Compare<br/>the books against your<br/>existing process"]
+    C --> R["3 Ratify tables<br/>no UNRATIFIED TEMPLATE<br/>loads in live mode"]
+    R --> S["4 Staged outbound<br/>one seam at a time,<br/>lowest risk first"]
+    S --> LIVE(["Live"])
+    S -. "5 rollback is config:<br/>disconnect the seam,<br/>history kept" .-> C
+    classDef ok fill:#dafbe1,stroke:#1a7f37,color:#1f2328
+    class LIVE ok
+```
+<!-- /diagram:deploy-go-live-doctrine-shadow-mode-f -->
+
 1. **Dark run**: load the identity, connect read-only inbound seams, leave every
    outbound seam disconnected (queue-only). The swarm builds books and records;
    nothing leaves.

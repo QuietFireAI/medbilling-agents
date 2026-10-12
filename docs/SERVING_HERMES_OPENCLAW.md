@@ -1,9 +1,22 @@
 # Serving Hermes / OpenClaw - Mounting Contract
 
+<!-- diagram:docs-serving-hermes-openclaw-serving-hermes - drawn by tools/gen_diagrams.py; edit the generator, not here -->
+```mermaid
+flowchart LR
+    HOST["Host app<br/>Hermes, OpenClaw, Claude Desktop"] -- "four tools only" --> T["identity.describe<br/>identity.submit<br/>identity.authority<br/>identity.audit"]
+    T --> S["identity_mcp server<br/>refuses to start unless the track,<br/>the signature check and the log are intact"]
+    S --> H{{"Hub"}}
+    H --> AG["this identity's agents"]
+    S -. "signs for the host only<br/>with --demo-signing" .-> H
+```
+
+*The host never routes inside the swarm. There is no release tool: releasing a held message needs your own signature.*
+<!-- /diagram:docs-serving-hermes-openclaw-serving-hermes -->
+
 The stack rounds out three ways to run this identity:
 
 1. **dispatcher-agents** (reference) - the vendored core in `dispatcher/`
-   IS that runtime; nothing to mount, it ships here and the 40-test suite
+   IS that runtime; nothing to mount, it ships here and the 43-test suite
    proves it.
 2. **Hermes** - mount as a governed skill/persona per the contract below.
 3. **OpenClaw** - mount as a skill folder per the contract below.

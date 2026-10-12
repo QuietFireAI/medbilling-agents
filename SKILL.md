@@ -11,7 +11,7 @@ A complete, ratified operating identity: 14 spoke agents, 44 legal routes
 (`identity/routes.json` - the closed track), 14 playbooks (P01-P14) with
 explicit human gates, 83 predeliberated decision tuples, ratified config
 doctrine, and a working reference runtime with 24 end-to-end tests, an 11-test core
-boot test and 5 MCP signing tests.
+boot test, 5 MCP signing tests and 3 diagram tests.
 
 ## The five absolute lines (non-negotiable, enforced in code)
 

@@ -9,6 +9,27 @@ tests prove.
 
 ## P01 - Charge to Clean Claim
 
+<!-- diagram:run-p01 - drawn by tools/gen_diagrams.py; edit the generator, not here -->
+```mermaid
+sequenceDiagram
+    autonumber
+    participant A01 as 01 Encounter Intake
+    participant A02 as 02 Claim Scrubbing
+    participant A03 as 03 Eligibility Verification
+    participant A07 as 07 Claim Submission
+    participant A13 as 13 Billing Records
+    A01->>A02: Complete encounter package
+    A02->>A03: Eligibility gate checks
+    A03->>A02: Coverage facts with timestamps
+    A02->>A07: Clean-claim package, gates green
+    Note over A07: Held - waits for your signed release
+    A02->>A13: Clean-claim package, gates green
+    A03->>A13: Coverage facts with timestamps
+```
+
+*One recorded run of `test_p01_charge_to_clean_claim`, numbered in order. Left out: each agent logging to the record and reporting what it is waiting on. The ratified steps: [playbooks/P01-charge-to-clean-claim](../playbooks/P01-charge-to-clean-claim/README.md).*
+<!-- /diagram:run-p01 -->
+
 *It starts when:* `encounter.captured` lands at 02 from the intake feed.
 
 **Phase 1 - Gates (parallel)**
@@ -37,6 +58,46 @@ tests prove.
 - Judgment-required edit unresolved: claim holds at the exception; the human's resolution re-enters through a fresh scrub.
 
 ## P02 - Prior Authorization Cycle
+
+<!-- diagram:run-p02 - drawn by tools/gen_diagrams.py; edit the generator, not here -->
+```mermaid
+sequenceDiagram
+    autonumber
+    actor B as You (billing staff)
+    participant A01 as 01 Encounter Intake
+    participant A02 as 02 Claim Scrubbing
+    participant A03 as 03 Eligibility Verification
+    participant A13 as 13 Billing Records
+    participant A06 as 06 Prior Authorization
+    participant A05 as 05 Documentation Collection
+    participant A12 as 12 Compliance and Deadlines
+    participant A09 as 09 Denial Management
+    participant A07 as 07 Claim Submission
+    A01->>A02: Complete encounter package
+    A02->>A03: Eligibility gate checks
+    A03->>A02: Coverage facts with timestamps
+    A03->>A13: Coverage facts with timestamps
+    A01->>A06: Auth-required service flags
+    A06->>A05: Clinical doc needs (sealed)
+    A06->>A02: Auth outcome facts
+    A06->>A12: Auth outcome facts
+    A06->>A13: Auth outcome facts
+    A05->>A02: Inventory status (sealed custody refs)
+    A05->>A06: Inventory status (sealed custody refs)
+    A06->>B: Assembled packages for attestation
+    A06->>A13: Assembled packages for attestation
+    A05->>A09: Inventory status (sealed custody refs)
+    A05->>A13: Inventory status (sealed custody refs)
+    A06->>A02: Auth outcome facts
+    A02->>A07: Clean-claim package, gates green
+    Note over A07: Held - waits for your signed release
+    A02->>A13: Clean-claim package, gates green
+    A06->>A12: Auth outcome facts
+    A06->>A13: Auth outcome facts
+```
+
+*One recorded run of `test_p02_prior_auth_cycle`, numbered in order. Left out: each agent logging to the record and reporting what it is waiting on. The ratified steps: [playbooks/P02-prior-auth-cycle](../playbooks/P02-prior-auth-cycle/README.md).*
+<!-- /diagram:run-p02 -->
 
 *It starts when:* `auth.request` at 06 from intake or scrubbing.
 
@@ -70,6 +131,34 @@ tests prove.
 
 ## P03 - Claim Submission Cycle
 
+<!-- diagram:run-p03 - drawn by tools/gen_diagrams.py; edit the generator, not here -->
+```mermaid
+sequenceDiagram
+    autonumber
+    actor B as You (billing staff)
+    participant A01 as 01 Encounter Intake
+    participant A02 as 02 Claim Scrubbing
+    participant A03 as 03 Eligibility Verification
+    participant A07 as 07 Claim Submission
+    participant A13 as 13 Billing Records
+    participant A10 as 10 A/R Follow-up
+    participant X as Outside world
+    A01->>A02: Complete encounter package
+    A02->>A03: Eligibility gate checks
+    A03->>A02: Coverage facts with timestamps
+    A02->>A07: Clean-claim package, gates green
+    Note over A07: Held - waits for your signed release
+    A02->>A13: Clean-claim package, gates green
+    A03->>A13: Coverage facts with timestamps
+    B->>A07: you sign the release
+    A07->>X: Submissions - held at the disclosure gate until a human signs its release (di...
+    A07->>A10: Status transitions
+    A07->>A13: Status transitions
+```
+
+*One recorded run of `test_p03_submission_needs_both_artifacts`, numbered in order. Left out: each agent logging to the record and reporting what it is waiting on. The ratified steps: [playbooks/P03-claim-submission-cycle](../playbooks/P03-claim-submission-cycle/README.md).*
+<!-- /diagram:run-p03 -->
+
 *It starts when:* `scrub.result` at 07.
 
 **Phase 1 - Submit and confirm**
@@ -91,6 +180,24 @@ tests prove.
 - Payer acknowledgment absent past lead-time: claim is NOT submitted; escalation with the chase history.
 
 ## P04 - Payment Posting & Reconciliation
+
+<!-- diagram:run-p04 - drawn by tools/gen_diagrams.py; edit the generator, not here -->
+```mermaid
+sequenceDiagram
+    autonumber
+    participant A08 as 08 Payment Posting
+    participant A12 as 12 Compliance and Deadlines
+    participant A13 as 13 Billing Records
+    participant A11 as 11 Patient Billing Records
+    A08->>A12: Adjustment and variance records
+    A08->>A13: Adjustment and variance records
+    A08->>A11: Posted remits (patient-balance effects)
+    A11->>A13: Statement, payment, and plan records
+    A08->>A13: Posted remits (patient-balance effects)
+```
+
+*One recorded run of `test_p04_posting_contract_rules_and_unruled_hold`, numbered in order. Left out: each agent logging to the record and reporting what it is waiting on. The ratified steps: [playbooks/P04-payment-posting-reconciliation](../playbooks/P04-payment-posting-reconciliation/README.md).*
+<!-- /diagram:run-p04 -->
 
 *It starts when:* ERA/EOB remittance arrives at 08.
 
@@ -118,6 +225,40 @@ tests prove.
 
 ## P05 - Denial & Appeal Cycle
 
+<!-- diagram:run-p05 - drawn by tools/gen_diagrams.py; edit the generator, not here -->
+```mermaid
+sequenceDiagram
+    autonumber
+    actor B as You (billing staff)
+    participant A08 as 08 Payment Posting
+    participant A11 as 11 Patient Billing Records
+    participant A13 as 13 Billing Records
+    participant A09 as 09 Denial Management
+    participant A10 as 10 A/R Follow-up
+    participant A05 as 05 Documentation Collection
+    participant A02 as 02 Claim Scrubbing
+    participant A06 as 06 Prior Authorization
+    A08->>A11: Posted remits (patient-balance effects)
+    A11->>A13: Statement, payment, and plan records
+    A08->>A13: Posted remits (patient-balance effects)
+    A08->>A09: Denials at posting, codes verbatim
+    A09->>A10: Triage outcomes and routing facts
+    A09->>A13: Triage outcomes and routing facts
+    A09->>A05: Appeal documentation needs (sealed)
+    A05->>A02: Inventory status (sealed custody refs)
+    A05->>A06: Inventory status (sealed custody refs)
+    A06->>B: Assembled packages for attestation
+    A06->>A13: Assembled packages for attestation
+    A05->>A09: Inventory status (sealed custody refs)
+    A09->>B: Appeal packages for decision + signature
+    A09->>A13: Appeal packages for decision + signature
+    A05->>A13: Inventory status (sealed custody refs)
+    B->>A09: Signed appeal-abandon authority - a denial ends signed or not at all
+```
+
+*One recorded run of `test_p05_denial_two_lane_and_signed_ending`, numbered in order. Left out: each agent logging to the record and reporting what it is waiting on. The ratified steps: [playbooks/P05-denial-appeal-cycle](../playbooks/P05-denial-appeal-cycle/README.md).*
+<!-- /diagram:run-p05 -->
+
 *It starts when:* `denial.intake` at 09.
 
 **Phase 1 - Triage**
@@ -143,6 +284,40 @@ tests prove.
 
 ## P06 - A/R Aging Follow-up
 
+<!-- diagram:run-p06 - drawn by tools/gen_diagrams.py; edit the generator, not here -->
+```mermaid
+sequenceDiagram
+    autonumber
+    participant A01 as 01 Encounter Intake
+    participant A02 as 02 Claim Scrubbing
+    participant A03 as 03 Eligibility Verification
+    participant A07 as 07 Claim Submission
+    participant A13 as 13 Billing Records
+    participant A10 as 10 A/R Follow-up
+    participant A12 as 12 Compliance and Deadlines
+    participant A09 as 09 Denial Management
+    participant A14 as 14 Daily Operations
+    A01->>A02: Complete encounter package
+    A02->>A03: Eligibility gate checks
+    A03->>A02: Coverage facts with timestamps
+    A02->>A07: Clean-claim package, gates green
+    Note over A07: Held - waits for your signed release
+    A02->>A13: Clean-claim package, gates green
+    A03->>A13: Coverage facts with timestamps
+    A07->>A10: Status transitions
+    A07->>A13: Status transitions
+    A12->>A07: Clock alerts at lead-time
+    A12->>A09: Clock alerts at lead-time
+    A12->>A10: Clock alerts at lead-time
+    A10->>A09: Payer status facts
+    A10->>A12: Payer status facts
+    A10->>A13: Payer status facts
+    A12->>A14: Clock alerts at lead-time
+```
+
+*One recorded run of `test_p06_ar_followup_chase`, numbered in order. Left out: each agent logging to the record and reporting what it is waiting on. The ratified steps: [playbooks/P06-ar-aging-followup](../playbooks/P06-ar-aging-followup/README.md).*
+<!-- /diagram:run-p06 -->
+
 *It starts when:* Aging threshold or `deadline.alert` surfaces an account at 10.
 
 **Phase 1 - Payer side**
@@ -164,6 +339,28 @@ tests prove.
 - Sequence exhausted unresolved: human queue with the complete contact history - the sequence ends in a decision.
 
 ## P07 - Patient Billing Cycle
+
+<!-- diagram:run-p07 - drawn by tools/gen_diagrams.py; edit the generator, not here -->
+```mermaid
+sequenceDiagram
+    autonumber
+    actor B as You (billing staff)
+    participant A11 as 11 Patient Billing Records
+    participant A04 as 04 Patient Communication
+    participant X as Outside world
+    A11->>A04: Statements and plan confirmations
+    A04->>X: Approved sends
+    A11->>A04: Statements and plan confirmations
+    A04->>X: Approved sends
+    A11->>A04: Statements and plan confirmations
+    A04->>X: Approved sends
+    A11->>A04: Statements and plan confirmations
+    A04->>X: Approved sends
+    A11->>B: flags it for you (sequence ceiling)
+```
+
+*One recorded run of `test_p07_patient_sequence_ceiling_never_auto_refers`, numbered in order. Left out: each agent logging to the record and reporting what it is waiting on. The ratified steps: [playbooks/P07-patient-billing-cycle](../playbooks/P07-patient-billing-cycle/README.md).*
+<!-- /diagram:run-p07 -->
 
 *It starts when:* `remit.posted` lands patient-responsibility amounts at 11, or the statement cycle date arrives.
 
@@ -190,6 +387,30 @@ tests prove.
 
 ## P08 - Timely Filing Protection
 
+<!-- diagram:run-p08 - drawn by tools/gen_diagrams.py; edit the generator, not here -->
+```mermaid
+sequenceDiagram
+    autonumber
+    actor B as You (billing staff)
+    participant A12 as 12 Compliance and Deadlines
+    participant A07 as 07 Claim Submission
+    participant A09 as 09 Denial Management
+    participant A10 as 10 A/R Follow-up
+    participant A13 as 13 Billing Records
+    participant A14 as 14 Daily Operations
+    A12->>A07: Clock alerts at lead-time
+    A12->>A09: Clock alerts at lead-time
+    A12->>A10: Clock alerts at lead-time
+    A10->>A09: Payer status facts
+    A10->>A12: Payer status facts
+    A10->>A13: Payer status facts
+    A12->>A14: Clock alerts at lead-time
+    A12->>B: flags it for you (clock)
+```
+
+*One recorded run of `test_p08_timely_filing_lead_then_escalation`, numbered in order. Left out: each agent logging to the record and reporting what it is waiting on. The ratified steps: [playbooks/P08-timely-filing-protection](../playbooks/P08-timely-filing-protection/README.md).*
+<!-- /diagram:run-p08 -->
+
 *It starts when:* Continuous: clock instantiation on every claim path; alerts at ratified lead-times.
 
 **Continuous - the clock engine**
@@ -212,6 +433,30 @@ tests prove.
 
 ## P09 - Morning Operations
 
+<!-- diagram:run-p09 - drawn by tools/gen_diagrams.py; edit the generator, not here -->
+```mermaid
+sequenceDiagram
+    autonumber
+    actor B as You (billing staff)
+    participant A12 as 12 Compliance and Deadlines
+    participant A07 as 07 Claim Submission
+    participant A09 as 09 Denial Management
+    participant A10 as 10 A/R Follow-up
+    participant A13 as 13 Billing Records
+    participant A14 as 14 Daily Operations
+    A12->>A07: Clock alerts at lead-time
+    A12->>A09: Clock alerts at lead-time
+    A12->>A10: Clock alerts at lead-time
+    A10->>A09: Payer status facts
+    A10->>A12: Payer status facts
+    A10->>A13: Payer status facts
+    A12->>A14: Clock alerts at lead-time
+    A14->>B: Morning book / EOD books
+```
+
+*One recorded run of `test_p09_p10_morning_report_carries_waits_and_clocks`, numbered in order. Left out: each agent logging to the record and reporting what it is waiting on. The ratified steps: [playbooks/P09-morning-operations](../playbooks/P09-morning-operations/README.md).*
+<!-- /diagram:run-p09 -->
+
 *It starts when:* Scheduled daily start (owner-configured time) or owner command.
 
 **Assemble (parallel, all to human review)**
@@ -233,6 +478,30 @@ tests prove.
 - Record source down: section marked absent; the book still delivers on time.
 
 ## P10 - End-of-Day Books
+
+<!-- diagram:run-p10 - drawn by tools/gen_diagrams.py; edit the generator, not here -->
+```mermaid
+sequenceDiagram
+    autonumber
+    actor B as You (billing staff)
+    participant A12 as 12 Compliance and Deadlines
+    participant A07 as 07 Claim Submission
+    participant A09 as 09 Denial Management
+    participant A10 as 10 A/R Follow-up
+    participant A13 as 13 Billing Records
+    participant A14 as 14 Daily Operations
+    A12->>A07: Clock alerts at lead-time
+    A12->>A09: Clock alerts at lead-time
+    A12->>A10: Clock alerts at lead-time
+    A10->>A09: Payer status facts
+    A10->>A12: Payer status facts
+    A10->>A13: Payer status facts
+    A12->>A14: Clock alerts at lead-time
+    A14->>B: Morning book / EOD books
+```
+
+*One recorded run of `test_p09_p10_morning_report_carries_waits_and_clocks`, numbered in order. Left out: each agent logging to the record and reporting what it is waiting on. The ratified steps: [playbooks/P10-end-of-day-books](../playbooks/P10-end-of-day-books/README.md).*
+<!-- /diagram:run-p10 -->
 
 *It starts when:* Scheduled day end (owner-configured time) or owner command.
 
@@ -258,6 +527,32 @@ tests prove.
 - Morning baseline absent: the sweep names that first and proceeds on records alone.
 
 ## P11 - Eligibility Change Mid-Cycle
+
+<!-- diagram:run-p11 - drawn by tools/gen_diagrams.py; edit the generator, not here -->
+```mermaid
+sequenceDiagram
+    autonumber
+    participant A01 as 01 Encounter Intake
+    participant A02 as 02 Claim Scrubbing
+    participant A03 as 03 Eligibility Verification
+    participant A07 as 07 Claim Submission
+    participant A13 as 13 Billing Records
+    participant A10 as 10 A/R Follow-up
+    A01->>A02: Complete encounter package
+    A02->>A03: Eligibility gate checks
+    A03->>A02: Coverage facts with timestamps
+    A02->>A07: Clean-claim package, gates green
+    Note over A07: Held - waits for your signed release
+    A02->>A13: Clean-claim package, gates green
+    A03->>A13: Coverage facts with timestamps
+    A03->>A02: Coverage facts with timestamps
+    A03->>A07: Coverage facts with timestamps
+    A03->>A10: Coverage facts with timestamps
+    A03->>A13: Coverage facts with timestamps
+```
+
+*One recorded run of `test_p11_eligibility_change_midcycle_holds_unsubmitted`, numbered in order. Left out: each agent logging to the record and reporting what it is waiting on. The ratified steps: [playbooks/P11-eligibility-change-midcycle](../playbooks/P11-eligibility-change-midcycle/README.md).*
+<!-- /diagram:run-p11 -->
 
 *It starts when:* `eligibility.result` at 03 (re-verify or payer notice) differing from the coverage facts a claim was gated on.
 
@@ -288,6 +583,24 @@ tests prove.
 
 ## P12 - Secondary Claim Cascade
 
+<!-- diagram:run-p12 - drawn by tools/gen_diagrams.py; edit the generator, not here -->
+```mermaid
+sequenceDiagram
+    autonumber
+    participant A08 as 08 Payment Posting
+    participant A11 as 11 Patient Billing Records
+    participant A13 as 13 Billing Records
+    participant A07 as 07 Claim Submission
+    A08->>A11: Posted remits (patient-balance effects)
+    A11->>A13: Statement, payment, and plan records
+    A08->>A13: Posted remits (patient-balance effects)
+    A08->>A07: Secondary claim cascade after primary remit
+    A08->>A13: Secondary claim cascade after primary remit
+```
+
+*One recorded run of `test_p12_secondary_cascade_fires_and_gates`, numbered in order. Left out: each agent logging to the record and reporting what it is waiting on. The ratified steps: [playbooks/P12-secondary-claim-cascade](../playbooks/P12-secondary-claim-cascade/README.md).*
+<!-- /diagram:run-p12 -->
+
 *It starts when:* `secondary.claim.ready` at 07: primary remit posted (08) with a secondary payer on file.
 
 **Phase 1 - Assemble**
@@ -313,6 +626,29 @@ tests prove.
 - Timely-filing clock on the secondary at risk: P08 doctrine takes over - escalate at lead-time.
 
 ## P13 - Credit Balance & Refund Compliance
+
+<!-- diagram:run-p13 - drawn by tools/gen_diagrams.py; edit the generator, not here -->
+```mermaid
+sequenceDiagram
+    autonumber
+    actor B as You (billing staff)
+    participant A08 as 08 Payment Posting
+    participant A11 as 11 Patient Billing Records
+    participant A13 as 13 Billing Records
+    participant A12 as 12 Compliance and Deadlines
+    A08->>A11: Posted remits (patient-balance effects)
+    A11->>A13: Statement, payment, and plan records
+    A08->>A13: Posted remits (patient-balance effects)
+    A08->>A11: Credit balance surfaced, refund clock arms at 12
+    A11->>A13: Statement, payment, and plan records
+    A08->>A12: Credit balance surfaced, refund clock arms at 12
+    A08->>A13: Credit balance surfaced, refund clock arms at 12
+    B->>A08: Signed refund authority - refunds are money
+    A08->>A12: Adjustment and variance records
+```
+
+*One recorded run of `test_p13_credit_refund_signed_inside_clock`, numbered in order. Left out: each agent logging to the record and reporting what it is waiting on. The ratified steps: [playbooks/P13-credit-balance-refund](../playbooks/P13-credit-balance-refund/README.md).*
+<!-- /diagram:run-p13 -->
 
 *It starts when:* `credit.balance` at 12 (and 11, 13) from posting.
 
@@ -342,6 +678,31 @@ tests prove.
 - Signed authority not received at escalation threshold: certain-miss escalation fires; the miss is named in the books (P08 doctrine).
 
 ## P14 - Records Request Response
+
+<!-- diagram:run-p14 - drawn by tools/gen_diagrams.py; edit the generator, not here -->
+```mermaid
+sequenceDiagram
+    autonumber
+    actor B as You (billing staff)
+    participant A01 as 01 Encounter Intake
+    participant A02 as 02 Claim Scrubbing
+    participant A03 as 03 Eligibility Verification
+    participant A07 as 07 Claim Submission
+    participant A13 as 13 Billing Records
+    participant A12 as 12 Compliance and Deadlines
+    A01->>A02: Complete encounter package
+    A02->>A03: Eligibility gate checks
+    A03->>A02: Coverage facts with timestamps
+    A02->>A07: Clean-claim package, gates green
+    Note over A07: Held - waits for your signed release
+    A02->>A13: Clean-claim package, gates green
+    A03->>A13: Coverage facts with timestamps
+    A13->>B: Records disclosure inventory (existence/type/date/source only) for human rele...
+    A13->>A12: Records disclosure inventory (existence/type/date/source only) for human rele...
+```
+
+*One recorded run of `test_p14_records_request_sealed_inventory`, numbered in order. Left out: each agent logging to the record and reporting what it is waiting on. The ratified steps: [playbooks/P14-records-request-response](../playbooks/P14-records-request-response/README.md).*
+<!-- /diagram:run-p14 -->
 
 *It starts when:* External records request lands: payer audit via 10, patient access request via 04.
 

@@ -1,5 +1,43 @@
 # Job Descriptions - Medical Billing Swarm
 
+<!-- diagram:docs-job-descriptions-job-descriptions - drawn by tools/gen_diagrams.py; edit the generator, not here -->
+```mermaid
+flowchart LR
+    B(["You (billing staff)"])
+    H{{"00 Dispatcher hub<br/>carries and logs every message"}}
+    B -- "signed decisions and settings" --> H
+    H -- "questions, holds, reports" --> B
+    subgraph AG["The agents - each owns one job"]
+        direction TB
+        A01["01 Encounter Intake"]
+        A02["02 Claim Scrubbing"]
+        A03["03 Eligibility Verification"]
+        A04["04 Patient Communication"]
+        A05["05 Documentation Collection"]
+        A06["06 Prior Authorization"]
+        A07["07 Claim Submission"]
+        A08["08 Payment Posting"]
+        A09["09 Denial Management"]
+        A10["10 A/R Follow-up"]
+        A11["11 Patient Billing Records"]
+        A12["12 Compliance and Deadlines"]
+        A13["13 Billing Records"]
+        A14["14 Daily Operations"]
+    end
+    H <--> AG
+    X[/"Outside world"/]
+    H <-- "only on open lanes; anyone but the party you serve waits for your release" --> X
+    classDef you fill:#f2cc60,stroke:#9a6700,color:#1f2328
+    classDef hub fill:#1f6feb,stroke:#1f6feb,color:#ffffff
+    classDef out fill:#d0d7de,stroke:#57606a,color:#1f2328
+    class B you
+    class H hub
+    class X out
+```
+
+*Every arrow goes through the hub, and only on lanes in `identity/routes.json`. Each agent's own picture is in its folder; each playbook's in `playbooks/`.*
+<!-- /diagram:docs-job-descriptions-job-descriptions -->
+
 One entry per agent: what it does all day, what it never does, and
 the doors it talks through. GENERATED from medbilling_data.py -
 regenerate with gen_docs.py, never hand-edit.

@@ -1,5 +1,22 @@
 # Operator Testing Manual - Medical Billing Swarm
 
+<!-- diagram:docs-operator-testing-manual-operator-testing-manual - drawn by tools/gen_diagrams.py; edit the generator, not here -->
+```mermaid
+flowchart LR
+    T0["Setup (once)"]
+    T1["Test 1 - The whole suite"]
+    T2["Test 2 - Watch one patient end to end"]
+    T3["Test 3 - Try to break the money lane..."]
+    T4["Test 4 - Tamper with the log"]
+    T5["Test 5 - The closed track"]
+    T0 --> T1
+    T1 --> T2
+    T2 --> T3
+    T3 --> T4
+    T4 --> T5
+```
+<!-- /diagram:docs-operator-testing-manual-operator-testing-manual -->
+
 A filmable, step-by-step script. Every step states what you type, what
 you must see, and what it proves. No step asks you to trust a claim the
 screen doesn't show. Written for a billing professional to run cold.
@@ -19,7 +36,7 @@ pip install -r requirements.txt
 ```
 python -m pytest tests_medbilling/ -v
 ```
-**You must see:** `40 passed`, including tests named for every playbook
+**You must see:** `43 passed`, including tests named for every playbook
 P01-P14 and for each absolute line (never-codes, sealed custody, unsigned
 money rejected, $0.00 tolerance, opt-out kill, closed track).
 **Proves:** the claims in the docs are executable, not aspirational.

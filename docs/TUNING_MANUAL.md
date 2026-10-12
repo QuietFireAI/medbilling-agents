@@ -8,6 +8,20 @@ updates this manual in the same commit.
 
 ## TOP OF LIST - Deliberate placeholders & unratified content (read before deployment)
 
+<!-- diagram:docs-tuning-manual-top-of-list - drawn by tools/gen_diagrams.py; edit the generator, not here -->
+```mermaid
+flowchart LR
+    T["Config table ships as an<br/>UNRATIFIED TEMPLATE"] --> E["You edit it to<br/>your site's reality"]
+    E --> RAT["You ratify it:<br/>status line, date, sign-off"]
+    RAT --> LD["Loaded in live mode"]
+    T -. "still a template" .-> NO["Fails closed at load"]
+    classDef ok fill:#dafbe1,stroke:#1a7f37,color:#1f2328
+    classDef stop fill:#ffd8d3,stroke:#cf222e,color:#1f2328
+    class LD ok
+    class NO stop
+```
+<!-- /diagram:docs-tuning-manual-top-of-list -->
+
 Full sweep 2026-07-18: everything stubbed, templated, or pending sign-off is
 listed here. If it's not in this table it's ratified content or real spec.
 

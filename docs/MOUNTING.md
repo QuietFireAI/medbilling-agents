@@ -14,6 +14,19 @@ mounted broken.
 
 ## The four tools
 
+<!-- diagram:docs-mounting-the-four-tools - drawn by tools/gen_diagrams.py; edit the generator, not here -->
+```mermaid
+flowchart LR
+    HOST["Host app<br/>Hermes, OpenClaw, Claude Desktop"] -- "four tools only" --> T["identity.describe<br/>identity.submit<br/>identity.authority<br/>identity.audit"]
+    T --> S["identity_mcp server<br/>refuses to start unless the track,<br/>the signature check and the log are intact"]
+    S --> H{{"Hub"}}
+    H --> AG["this identity's agents"]
+    S -. "signs for the host only<br/>with --demo-signing" .-> H
+```
+
+*The host never routes inside the swarm. There is no release tool: releasing a held message needs your own signature.*
+<!-- /diagram:docs-mounting-the-four-tools -->
+
 - `identity.describe` — read-only: the closed track (legal intents),
   playbooks, and governance guarantees. Call first.
 - `identity.submit` — push ONE intent at the front door; the hub

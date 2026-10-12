@@ -1,5 +1,26 @@
 # Playbooks P01-P14 - Medical Billing Swarm
 
+<!-- diagram:docs-playbooks- - drawn by tools/gen_diagrams.py; edit the generator, not here -->
+```mermaid
+flowchart LR
+    subgraph C1["Class 1 - clock-critical (prior auth blocking care, appeal deadline..."]
+        direction TB
+        P02["P02 Prior Authorization Cycle"] ~~~ P05["P05 Denial and Appeal Cycle"] ~~~ P08["P08 Timely Filing Protection"] ~~~ P13["P13 Credit Balance and Refund Compliance"]
+    end
+    subgraph C2["Class 2 - active revenue-cycle lifecycle and books"]
+        direction TB
+        P01["P01 Charge to Clean Claim"] ~~~ P03["P03 Claim Submission Cycle"] ~~~ P04["P04 Payment Posting and Reconciliation"] ~~~ P07["P07 Patient Billing Cycle"] ~~~ P09["P09 Morning Operations"] ~~~ P10["P10 End-of-Day Books"] ~~~ P11["P11 Eligibility Change Mid-Cycle"] ~~~ P12["P12 Secondary Claim Cascade"] ~~~ P14["P14 Records Request Response"]
+    end
+    subgraph C3["Class 3 - aging follow-up"]
+        direction TB
+        P06["P06 A/R Aging Follow-up"]
+    end
+    C1 ~~~ C2 ~~~ C3
+```
+
+*Each playbook's steps are drawn in its folder: `playbooks/PNN-*/README.md`.*
+<!-- /diagram:docs-playbooks- -->
+
 The consolidated catalog. Full per-playbook SKILL.md files live in
 playbooks/. GENERATED from medbilling_playbooks.py.
 

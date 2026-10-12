@@ -21,6 +21,21 @@ source.
 - **manners re-injections**: count and positions (fade-tracking)
 
 ## Learning loop (the point of all this)
+
+<!-- diagram:after-action-learning-loop-the-point-of-all - drawn by tools/gen_diagrams.py; edit the generator, not here -->
+```mermaid
+flowchart LR
+    RUN["A playbook run"] --> REP["After-action report<br/>one file per run"]
+    REP --> DS[("The dataset")]
+    DS --> DEV{"A deviation that<br/>keeps recurring?"}
+    DEV -- yes --> PA["Playbook change proposed<br/>to you - never self-amended"]
+    DS --> AMB{"The same ambiguity hold<br/>at the same crossing?"}
+    AMB -- yes --> TU["New decision tuple<br/>proposed for you to ratify"]
+    DS -. "only batches you release" .-> LEARN["Platform learning"]
+    classDef you fill:#f2cc60,stroke:#9a6700,color:#1f2328
+    class PA,TU you
+```
+<!-- /diagram:after-action-learning-loop-the-point-of-all -->
 1. Reports accumulate as the dataset.
 2. Recurring deviations = the spec is wrong somewhere: playbook amendment
    proposed to the human (never self-amended - specs change by signed

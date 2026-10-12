@@ -1,5 +1,17 @@
 # Installing the DispatcherAgents Medical Billing Swarm (Healthcare RCM) Skills
 
+<!-- diagram:install-installing - drawn by tools/gen_diagrams.py; edit the generator, not here -->
+```mermaid
+flowchart LR
+    F["The 15 agent folders<br/>00-dispatcher ... 14-...<br/>each a SKILL.md"] --> H1["A skills-capable host<br/>Claude, Codex, Gemini, Copilot, Hermes"]
+    F --> RT["The dispatcher runtime<br/>dispatcher/ in this repo"]
+    H1 --> R1["Role text only:<br/>no routing, envelopes or queues"]
+    RT --> R2["The governed swarm:<br/>closed track, signatures,<br/>holds, audit log"]
+    classDef ok fill:#dafbe1,stroke:#1a7f37,color:#1f2328
+    class R2 ok
+```
+<!-- /diagram:install-installing -->
+
 These 15 agent folders use the Agent Skills open standard (agentskills.io):
 each folder contains a SKILL.md with YAML frontmatter (name, description) and
 markdown instructions. The FILE FORMAT is identical across all supporting
