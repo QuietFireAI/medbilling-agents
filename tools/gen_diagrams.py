@@ -70,8 +70,8 @@ HUMAN = {
 }[KIND]
 
 # Real end-to-end test runs drawn in docs/PLAY-BY-PLAY.md. Only tests that
-# run the playbook they are numbered for are listed (claim's test_p02/p03/p04
-# test other things; their playbooks get no run picture).
+# run the playbook they are numbered for are listed. Tests are looked up in
+# every test_playbooks_*.py module of the repo's test folder.
 RUNS = {
     "medbilling": {
         "P01": "test_p01_charge_to_clean_claim",
@@ -91,6 +91,9 @@ RUNS = {
     },
     "claim": {
         "P01": "test_p01_fnol_to_dispatch",
+        "P02": "test_p02_property_claim_lifecycle",
+        "P03": "test_p03_auto_claim_lifecycle",
+        "P04": "test_p04_total_loss_settlement_records",
         "P05": "test_p05_fraud_silent_aggregation_signed_ending",
         "P06": "test_p06_subro_preparation_human_money",
         "P07": "test_p07_signed_payment_and_zero_tolerance",
@@ -424,7 +427,9 @@ def playbooks_index():
 # ------------------------------------------------------------ real runs
 def capture(test):
     from dispatcher import core
-    mod = importlib.import_module(f"{TESTS}.test_playbooks_e2e_all")
+    mods = [importlib.import_module(f"{TESTS}.{os.path.basename(f)[:-3]}")
+            for f in sorted(glob.glob(os.path.join(ROOT, TESTS, "test_playbooks_*.py")))]
+    mod = next(m for m in mods if hasattr(m, test))
     events = []
     orig = core.AuditLog.append
 
