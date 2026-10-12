@@ -19,7 +19,7 @@ pip install -r requirements.txt
 ```
 python -m pytest tests_medbilling/ -v
 ```
-**You must see:** `35 passed`, including tests named for every playbook
+**You must see:** `40 passed`, including tests named for every playbook
 P01-P14 and for each absolute line (never-codes, sealed custody, unsigned
 money rejected, $0.00 tolerance, opt-out kill, closed track).
 **Proves:** the claims in the docs are executable, not aspirational.

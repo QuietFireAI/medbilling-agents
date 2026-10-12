@@ -21,8 +21,26 @@ mounted broken.
   returns result or refusal-with-reason.
 - `identity.authority` — the signed-money lane; unsigned authority is
   rejected and the rejection is returned so you can see the gate work.
+  `payload.to` names the receiving agent and is required.
 - `identity.audit` — hash-chain verification (entries, chain_verified,
   dead letters) so the host can prove tamper-evidence itself.
+
+## Signing over MCP
+
+The server makes its own key at boot and, by default, signs nothing for the
+host: an `identity.authority` call asking the server to sign
+(`DEMO_SIGN_WITH_SERVER_KEY`) is refused with a reason, and an unsigned one is
+rejected by the hub. Start the server with `--demo-signing` only to show the
+signed path in a demo; it then signs for any host that asks, and
+`identity.describe` reports `server_signs_for_host: true`. A production signed
+lane needs the host to present an envelope signed with the operator's own key;
+that protocol is not built yet (fixed 2026-10-12, ported from
+listing-assistants).
+
+A message to a counterparty is held by the hub until a human signs a
+`disclosure.authority` naming it (`Hub.release_disclosure`). This surface has
+no release tool, for the same reason: there is no host-presented signature
+yet.
 
 ## Prerequisites
 
@@ -36,10 +54,10 @@ pip install mcp                   # the MCP SDK (stdio server/client)
 ```
 python3 tools/mcp_roundtrip.py
 ```
-Spawns the server over stdio and calls all four tools through the real
-MCP protocol — the exact transport the hosts use. You should see the
-closed surface, a gated submit, unsigned money rejected, signed money
-executed, and the chain verified.
+Spawns the server over stdio (with `--demo-signing`) and calls all four
+tools through the real MCP protocol — the exact transport the hosts use. You
+should see the closed surface, a gated submit, unsigned money rejected, money
+signed by the server in demo mode executed, and the chain verified.
 
 ## Hermes (Nous Research)
 

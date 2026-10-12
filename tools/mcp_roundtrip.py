@@ -22,7 +22,10 @@ def line(s=""):
 async def main():
     params = StdioServerParameters(
         command=sys.executable,
-        args=["-m", "dispatcher.identity_mcp"],
+        # --demo-signing lets the server sign the authority call below so the
+        # signed path can be shown; without it the server signs nothing for a
+        # host (see dispatcher/identity_mcp.py, "Signing").
+        args=["-m", "dispatcher.identity_mcp", "--demo-signing"],
         env={**os.environ, "PYTHONPATH": ROOT, "IDENTITY_ROOT": ROOT},
         cwd=ROOT)
 
@@ -82,7 +85,8 @@ async def main():
                             "payload": {"amount": 500.0, "to": "08"}})
             line(f"  ok: {r['ok']}  reason: {r['reason']}")
 
-            line("\n[identity.authority] properly signed - executes:")
+            line("\n[identity.authority] signed by the server (--demo-signing"
+                 " mode only) - executes:")
             r = await call("identity.authority",
                            {"intent": "refund.authority",
                             "payload": {"amount": 500.0, "to": "08"},

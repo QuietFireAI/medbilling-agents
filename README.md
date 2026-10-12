@@ -7,7 +7,7 @@ The runtime never contains vertical text, and this repo never edits transport
 code: `dispatcher/` holds a byte-identical copy of the dispatcher-agents core,
 checked by `tools/sync_core.py --check`. That split is the architecture.
 
-**Status: v0.2 ratified 2026-07-18 (extended from v0.1 2026-07-11) - owner sign-off. WORKING BUILD: vendored dispatcher core + real spokes, 35-test suite (`tests_medbilling/`: playbooks end to end plus the core boot test), live demo (`tools/run_demo.py`), and an MCP mount (`docs/MOUNTING.md`). No licensed legal, compliance (HIPAA), or coding-practice review has been performed.**
+**Status: v0.2 ratified 2026-07-18 (extended from v0.1 2026-07-11) - owner sign-off. WORKING BUILD: vendored dispatcher core + real spokes, 40-test suite (`tests_medbilling/`: playbooks end to end, the core boot test, MCP signing), live demo (`tools/run_demo.py`), and an MCP mount (`docs/MOUNTING.md`). No licensed legal, compliance (HIPAA), or coding-practice review has been performed.**
 
 ## What this is for
 
@@ -39,10 +39,11 @@ What it never does - the five absolute lines (identity/IDENTITY-medical-billing-
 | `tools/sync_core.py` | Copies the core in (`--core <path>`) or checks it (`--check`: exit 1 on any drift) |
 | `tests_medbilling/test_core_boot.py` | This identity loaded into the core: loader, audience labels, principal delivery, counterparty hold and signed release, authority signatures, closed track |
 | `requirements.txt` | pytest, cryptography, the six pillars pinned to the commits the suite passed against, and the MCP package |
+| `.github/workflows/ci.yml` | CI on every push: install and test, core parity against dispatcher-agents main, and the suite with no pillars installed |
 | `identity/priority.json` | JIT playbook priority classes (ratified 2026-07-11; extended & ratified 2026-07-18) |
 | `identity/IDENTITY-medical-billing-agent.md` | The identity declaration |
 | `00-dispatcher/ ... 14-daily-operations/` | 15 agent SKILL.md + DECISIONS.md (tuple layer) |
-| `playbooks/P01 ... P10` | Deployment playbooks: charge-to-clean-claim through EOD books |
+| `playbooks/P01 ... P14` | Deployment playbooks: charge-to-clean-claim through records requests |
 | `SWARM.md` | Framework manifest + swarm-level tuples |
 | `MANNERS.md` | Conduct constants, hash-registered at boot attestation |
 | `TUPLE_INDEX.md` | Generated drill-down: tuple → agent → playbooks |
@@ -71,7 +72,7 @@ without a label is treated as counterparty.
 ```bash
 pip install -r requirements.txt
 python3 verify_swarm.py    # 0 failures, 0 warnings expected
-python -m pytest tests_medbilling/    # 35 passed
+python -m pytest tests_medbilling/    # 40 passed
 python tools/sync_core.py --core ../dispatcher-agents --check   # 16 files, zero drift
 ```
 

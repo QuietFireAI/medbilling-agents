@@ -66,7 +66,7 @@ layer) > playbooks > task judgment. A lower layer contradicting a higher layer
 is a spec defect: halt, flag, human.
 
 Status: Manner 15 (THE ABSOLUTE SIGNAL) added 2026-10-12 with the core sync -
-owner sign-off pending for this revision. Its enforceable form is
+RATIFIED 2026-10-12, owner sign-off (Jeff Phillips). Its enforceable form is
 dispatcher/absolute_signal.py (SIGNAL_TEXT) and the gate in dispatcher/hub.py.
 THIS EDIT CHANGES THE FILE HASH: the boot manifest re-registers the new hash on
 next attestation, which is a signed step. Prior status: v0.2 ratified 2026-07-18 - owner sign-off - re-injection triggers are CONSTANTS per §Re-injection (the prior status line contradicted that section and was the bug); backstop N=10 PROVISIONAL pending after-action data. Trigger instrumentation runtime-tested (dispatcher-agents suite); conduct itself not runtime-tested.

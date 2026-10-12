@@ -20,6 +20,22 @@ guarantee travels with the server; it cannot be silently mounted broken.
 Usage:
     python3 -m dispatcher.identity_mcp            # serve medbilling (this repo)
     IDENTITY_ROOT=/path python3 -m dispatcher.identity_mcp
+    python3 -m dispatcher.identity_mcp --demo-signing   # DEMO ONLY, see below
+
+Signing (fixed 2026-10-12, ported from listing-assistants audit MCP-1): the
+server holds a key it generates at boot. Before this fix it used that key to
+sign any `identity.authority` call carrying "DEMO_SIGN_WITH_SERVER_KEY" for
+whatever host asked, so over MCP a signed refund or write-off proved only
+that the host asked, not that a human signed. Now the server signs nothing
+for a host unless it was started with --demo-signing (used by
+tools/mcp_roundtrip.py to show the signed path). Without it the call is
+refused with a reason. A production signed lane needs the host to present an
+envelope signed with the operator's own key; that protocol is not built yet.
+
+Held messages: an outbound message to a counterparty is held by the hub
+until a human signs a `disclosure.authority` naming it
+(`Hub.release_disclosure`). This surface offers no release tool, for the
+same reason: there is no host-presented signature yet.
 """
 from __future__ import annotations
 
@@ -27,6 +43,7 @@ import asyncio
 import json
 import os
 import sys
+import tempfile
 import uuid
 
 # --- locate the identity this wrapper serves -------------------------------
@@ -117,9 +134,11 @@ class GovernedIdentity:
     """Builds the hub + spokes once, keeps state across submits within the
     server's lifetime, and exposes only front-door operations."""
 
-    def __init__(self, routes, signer, verifier):
+    def __init__(self, routes, signer, verifier, demo_signing: bool = False):
         self.signer = signer
-        self.audit_path = f"/tmp/{IDENTITY_NAME}-mcp-{uuid.uuid4().hex[:8]}.jsonl"
+        self.demo_signing = demo_signing
+        self.audit_path = os.path.join(
+            tempfile.gettempdir(), f"{IDENTITY_NAME}-mcp-{uuid.uuid4().hex[:8]}.jsonl")
         self.hub = Hub(routes, AuditLog(self.audit_path),
                        signature_verifier=verifier.verifier())
         self.external = []
@@ -129,8 +148,10 @@ class GovernedIdentity:
         self.hub.on_turn_start()
 
     # Spoke modules known to this wrapper, by detection (not by folder name).
-    KNOWN = {"medbilling_spokes": "_wire_medbilling",
-             "listing_spokes": "_wire_listing"}
+    # Only this repo's spoke module (2026-10-12: the other identities'
+    # wiring was dead code here and the listing branch signed for the
+    # host unconditionally).
+    KNOWN = {"medbilling_spokes": "_wire_medbilling"}
 
     def _wire_spokes(self):
         """Mount real spokes by DETECTING which spoke module is present in
@@ -184,42 +205,6 @@ class GovernedIdentity:
                 self.hub.register(aid, sp.handle)
         self.spokes = s
 
-    def _wire_listing(self, _m):
-        """Wire the full listing swarm (18 spokes) exactly as the e2e
-        harness does. The entry module is listing_spokes; the rest are
-        listing_spokes_NN."""
-        import importlib
-        L = lambda n: importlib.import_module(f"dispatcher.{n}")
-        base = L("listing_spokes")
-        s = {
-            "01": base.Spoke01LeadCapture(self.hub,
-                                          brokerage_scope={"L1", "MLS-1"}),
-            "02": L("listing_spokes_02").Spoke02LeadQualification(self.hub),
-            "04": L("listing_spokes_04").Spoke04ListingDescription(self.hub),
-            "05": L("listing_spokes_05").Spoke05MLSListingManagement(self.hub),
-            "06": L("listing_spokes_06").Spoke06ShowingScheduler(self.hub),
-            "07": L("listing_spokes_07").Spoke07TransactionCoordinator(self.hub),
-            "08": L("listing_spokes_08").Spoke08DocumentCollection(
-                self.hub, expected_senders={}),
-            "09": L("listing_spokes_09").Spoke09VendorCoordination(
-                self.hub, roster={"v-photo": {"kind": "photography",
-                                              "license_expiry": "2027-01-01",
-                                              "insurance_expiry": "2027-01-01",
-                                              "regulated": False}}),
-            "10": L("listing_spokes_10").Spoke10MarketData(self.hub),
-            "11": L("listing_spokes_11").Spoke11ClientCommunication(self.hub),
-            "12": L("listing_spokes_12").Spoke12MarketingCampaign(self.hub),
-            "13": L("listing_spokes_13").Spoke13BuyerSearchMatch(self.hub),
-            "14": base.Spoke14CRMPipeline(self.hub),
-            "15": L("listing_spokes_15").Spoke15FinancialTracking(self.hub),
-            "16": L("listing_spokes_16").Spoke16AfterCloseReferral(self.hub),
-            "17": L("listing_spokes_17").Spoke17ComplianceFairHousing(self.hub),
-            "18": L("listing_spokes_18").Spoke18CalendarTask(self.hub),
-        }
-        for aid, sp in s.items():
-            self.hub.register(aid, sp.handle)
-        self.spokes = s
-
     # --- front-door operations -------------------------------------------
     def describe(self):
         routes = json.load(open(ROUTES_PATH))
@@ -236,6 +221,7 @@ class GovernedIdentity:
             "playbooks": priority,
             "governance": {
                 "signed_authority_required": True,
+                "server_signs_for_host": self.demo_signing,
                 "reconciliation_tolerance": "$0.00",
                 "audit": "hash-chained, tamper-evident (see identity.audit)",
                 "note": ("This is a governed identity, not a toolbox. The "
@@ -261,28 +247,6 @@ class GovernedIdentity:
         entry points. Anything not a legal front-door op is refused."""
         modname = getattr(self.spoke_mod, "__name__", "") if self.spoke_mod \
             else ""
-        if modname.endswith("listing_spokes"):
-            if intent == "listing.authorize":
-                # front door: the signed new-listing authorization (P01)
-                from dispatcher.core import Envelope
-                env = Envelope(from_agent="human", to_agent="05",
-                               intent="listing.change.authorized",
-                               client_context_id=ctx, payload=payload,
-                               provenance={"source": "mcp-host",
-                                           "captured_at": "runtime",
-                                           "verbatim_available": True})
-                self.signer.sign(env)
-                res = self.hub.send(env)
-                return {"ok": res.get("status") == "ack",
-                        "context_id": ctx,
-                        "note": "listing authorization submitted; the swarm "
-                                "runs P01 setup->production->go-live behind "
-                                "the gates",
-                        "audit_entries": len(self.hub.audit.read())}
-            return {"ok": False, "context_id": ctx,
-                    "reason": f"'{intent}' is not a legal front-door intent "
-                              f"for listing; the signed lane is "
-                              f"'listing.authorize'"}
         if modname.endswith("medbilling_spokes"):
             if intent == "encounter.capture":
                 self.spokes["03"].db[ctx] = {"status":
@@ -309,14 +273,22 @@ class GovernedIdentity:
         """The signed-money lane, explicit and separate. Without a real
         signature the hub rejects it - proving the gate to the caller."""
         ctx = context_id or f"mcp-{uuid.uuid4().hex[:8]}"
+        if not payload.get("to"):
+            return {"ok": False, "context_id": ctx, "hub_status": None,
+                    "reason": "payload.to (the receiving agent) is required"}
         env = Envelope(from_agent="human",
-                       to_agent=payload.get("to", "08"),
+                       to_agent=payload["to"],
                        intent=intent, client_context_id=ctx,
                        payload=payload,
                        provenance={"source": "mcp-host",
                                    "captured_at": "runtime",
                                    "verbatim_available": True})
-        if signature_hex == "DEMO_SIGN_WITH_SERVER_KEY":
+        if signature_hex == "DEMO_SIGN_WITH_SERVER_KEY" and not self.demo_signing:
+            return {"ok": False, "context_id": ctx, "hub_status": None,
+                    "reason": "this server signs for a host only in "
+                              "--demo-signing mode; present the operator's "
+                              "own signature"}
+        if signature_hex == "DEMO_SIGN_WITH_SERVER_KEY" and self.demo_signing:
             # explicit demo affordance: server signs so a host can see the
             # signed path succeed. Production hosts present their OWN
             # signature; this is clearly labelled, not a hidden bypass.
@@ -424,7 +396,11 @@ async def _serve():
     sys.stderr.write(
         f"[identity_mcp] conformance PASSED for {IDENTITY_NAME}: "
         f"closed track + signer gate + audit chain intact\n")
-    identity = GovernedIdentity(routes, signer, verifier)
+    demo = "--demo-signing" in sys.argv[1:]
+    if demo:
+        sys.stderr.write("[identity_mcp] DEMO SIGNING ON: the server will sign "
+                         "authority actions for the host. Not for production.\n")
+    identity = GovernedIdentity(routes, signer, verifier, demo_signing=demo)
     server = build_server(identity)
     from mcp.server.stdio import stdio_server
     async with stdio_server() as (read, write):
