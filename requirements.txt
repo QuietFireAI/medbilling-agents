@@ -16,6 +16,11 @@ pytest>=8.0
 # invisible-dependency class this file exists to prevent.
 cryptography>=42
 
+# verify_swarm.py parses each SKILL.md's YAML frontmatter - found by the
+# first CI run here (2026-10-12): absent from this file, verify_swarm failed
+# with "pyyaml not installed" on a clean runner.
+pyyaml>=6
+
 # The six pillar packages, pinned to exact commits (owner decision J9,
 # 2026-10-12): the commits the 2026-10-12 suite passed against. pip-audit
 # still cannot check git installs; a pin means what you tested is what you
