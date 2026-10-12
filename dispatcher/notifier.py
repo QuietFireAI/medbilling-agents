@@ -28,20 +28,26 @@ TWILIO_ACCOUNT_SID = os.environ.get("TWILIO_ACCOUNT_SID", "PLACEHOLDER_ACCOUNT_S
 TWILIO_AUTH_TOKEN = os.environ.get("TWILIO_AUTH_TOKEN", "PLACEHOLDER_AUTH_TOKEN")
 TWILIO_FROM_NUMBER = os.environ.get("TWILIO_FROM_NUMBER", "+15555550101")
 TWILIO_TO_NUMBER = os.environ.get("TWILIO_TO_NUMBER", DEFAULT_TO_NUMBER)
+TWILIO_WHATSAPP_FROM = os.environ.get("TWILIO_WHATSAPP_FROM", "whatsapp:+14155238886")
+TWILIO_WHATSAPP_TO = os.environ.get("TWILIO_WHATSAPP_TO", f"whatsapp:{DEFAULT_TO_NUMBER}")
 
 
-def format_notification_text(queue: str, record: dict) -> str:
-    """Builds the actual SMS body from a queue name + record. Real
+def format_notification_text(queue: str, record: dict, max_length: int = 320) -> str:
+    """Builds the actual SMS/WhatsApp body from a queue name + record. Real
     formatting logic - pulls whatever's actually present (reason/trigger/
     agent/context), never invents fields that aren't there."""
     ctx = record.get("client_context_id", "unknown")
     agent = record.get("agent") or record.get("from_agent") or "?"
     reason = (record.get("reason") or record.get("trigger")
              or (record.get("payload") or {}).get("reason") or "")
+    wait_id = record.get("wait_id", "")
+    
     text = f"[DispatcherAgents] {queue} | agent={agent} ctx={ctx}"
+    if wait_id:
+        text += f" | wait_id={wait_id}"
     if reason:
         text += f" | {reason}"
-    return text[:320]  # SMS-reasonable length cap; Twilio splits longer anyway
+    return text[:max_length]
 
 
 def send_sms_via_twilio(body: str, to_number: str | None = None,
@@ -61,13 +67,46 @@ def send_sms_via_twilio(body: str, to_number: str | None = None,
     req.add_header("Authorization", f"Basic {auth}")
     req.add_header("Content-Type", "application/x-www-form-urlencoded")
     try:
-        with urllib.request.urlopen(req, timeout=timeout) as resp:
-            return {"status": "sent", "http_status": resp.status}
+        with urllib.request.urlopen(req, timeout=timeout) as resp:  # nosec B310
+            return {"status": "sent", "http_status": resp.status, "is_fallback": False}
     except urllib.error.HTTPError as e:
-        return {"status": "failed", "http_status": e.code,
+        return {"status": "failed", "http_status": e.code, "is_fallback": True,
+                "fallback_reason": f"Twilio API error {e.code}: failover to local audit ledger",
                 "body": e.read().decode(errors="replace")[:300]}
     except Exception as e:
-        return {"status": "failed", "error": repr(e)}
+        return {"status": "failed", "is_fallback": True,
+                "fallback_reason": f"Network exception: {e!r}", "error": repr(e)}
+
+
+def send_whatsapp_via_twilio(body: str, to_number: str | None = None,
+                             from_number: str | None = None,
+                             timeout: float = 5.0) -> dict:
+    """Real Twilio WhatsApp REST API call. Ensures numbers carry the
+    'whatsapp:' channel prefix required by Twilio."""
+    raw_to = to_number or TWILIO_WHATSAPP_TO
+    raw_from = from_number or TWILIO_WHATSAPP_FROM
+
+    formatted_to = raw_to if raw_to.startswith("whatsapp:") else f"whatsapp:{raw_to}"
+    formatted_from = raw_from if raw_from.startswith("whatsapp:") else f"whatsapp:{raw_from}"
+
+    url = (f"https://api.twilio.com/2010-04-01/Accounts/"
+           f"{TWILIO_ACCOUNT_SID}/Messages.json")
+    data = urllib.parse.urlencode({
+        "To": formatted_to, "From": formatted_from, "Body": body,
+    }).encode()
+    auth = base64.b64encode(
+        f"{TWILIO_ACCOUNT_SID}:{TWILIO_AUTH_TOKEN}".encode()).decode()
+    req = urllib.request.Request(url, data=data, method="POST")
+    req.add_header("Authorization", f"Basic {auth}")
+    req.add_header("Content-Type", "application/x-www-form-urlencoded")
+    try:
+        with urllib.request.urlopen(req, timeout=timeout) as resp:  # nosec B310
+            return {"status": "sent", "http_status": resp.status, "channel": "whatsapp"}
+    except urllib.error.HTTPError as e:
+        return {"status": "failed", "http_status": e.code, "channel": "whatsapp",
+                "body": e.read().decode(errors="replace")[:300]}
+    except Exception as e:
+        return {"status": "failed", "channel": "whatsapp", "error": repr(e)}
 
 
 def sms_human_notifier(queue: str, record: dict) -> dict:
@@ -76,3 +115,11 @@ def sms_human_notifier(queue: str, record: dict) -> dict:
     not conditional, not mocked by default."""
     body = format_notification_text(queue, record)
     return send_sms_via_twilio(body)
+
+
+def whatsapp_human_notifier(queue: str, record: dict) -> dict:
+    """Dispatches real-time alerts directly to the broker's mobile phone
+    via WhatsApp. Allows the broker to supervise in the field without sitting
+    at an office desktop."""
+    body = format_notification_text(queue, record)
+    return send_whatsapp_via_twilio(body)

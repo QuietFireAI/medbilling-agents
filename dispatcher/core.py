@@ -1,4 +1,4 @@
-"""dispatcher.core - the TelsonBase dispatcher message core (Day 1).
+"""dispatcher.core - the dispatcher message core (Day 1).
 
 Doctrine encoded as executable behavior:
 - An ack is a factual claim: issued only after persist (audit) AND delivery.
@@ -11,12 +11,29 @@ Spec sources: DISPATCHER_CORE.md, 00-dispatcher/SKILL.md, SWARM.md v0.16.
 """
 from __future__ import annotations
 import hashlib
-import json, os, time, uuid
+import json, os, threading, time, uuid
 from dataclasses import dataclass, field
 from typing import Callable, Optional
 
 CONFIDENCE = {"source_verified", "stated_by_party", "unknown"}
 SPECIAL = {"human", "external", "queue", "any"}
+
+# --- ABSOLUTE SIGNAL, disclosure half -------------------------------------
+# Every route that leaves the swarm to `external` declares WHO is on the far
+# end. The class decides whether an outbound message may pass or must hold for
+# a human. There is no fourth option: a route to `external` that names no
+# audience is not waved through - it fails closed to the most restricted class.
+AUDIENCE = {"principal", "counterparty", "public"}
+
+# The principal is the one party the identity serves. Sending to the principal
+# is disclosure to the person whose information it already is - never gated.
+# `counterparty` (the other side) and `public` (an open feed) are where a
+# position leaks, so both hold for HITL in this strict first version.
+AUDIENCE_GATED = {"counterparty", "public"}
+
+# Fail-closed default: an external route with no declared audience is treated
+# as counterparty. Absence of a claim is never read as the permissive state.
+AUDIENCE_DEFAULT = "counterparty"
 
 
 @dataclass
@@ -62,6 +79,39 @@ class Routes:
         self.version = data.get("version", "?")
         self.entries = [(r["intent"], set(r["senders"]), set(r["receivers"]))
                         for r in data["routes"]]
+        # Audience metadata rides alongside, keyed by intent, and only for
+        # routes that actually target `external`. Keeping it in a separate map
+        # leaves entries/matches/tuple_legal byte-for-byte unchanged so no
+        # existing route logic or test can shift under this.
+        self.audience: dict[str, str] = {}
+        self.audience_verified: dict[str, bool] = {}
+        for r in data["routes"]:
+            if "external" in r.get("receivers", []):
+                # fail closed: unlabeled external route -> counterparty
+                aud = r.get("audience", AUDIENCE_DEFAULT)
+                if aud not in AUDIENCE:
+                    aud = AUDIENCE_DEFAULT
+                self.audience[r["intent"]] = aud
+                # a label is a claim about behavior; until a real playbook run
+                # confirms where the message lands, the claim is provisional.
+                self.audience_verified[r["intent"]] = bool(
+                    r.get("audience_verified", False))
+
+    def audience_for(self, intent: str) -> Optional[str]:
+        """Audience class for an external-bound intent, or None if the route
+        does not leave to `external`. Fail-closed at the source: an external
+        route we have no record for is treated as the guarded default, never
+        as ungated."""
+        for i in self.audience:
+            if i == intent or (i.endswith(".*") and intent.startswith(i[:-1])):
+                return self.audience[i]
+        return None
+
+    def audience_is_verified(self, intent: str) -> bool:
+        for i in self.audience_verified:
+            if i == intent or (i.endswith(".*") and intent.startswith(i[:-1])):
+                return self.audience_verified[i]
+        return False
 
     def matches(self, intent: str):
         for i, s, r in self.entries:
@@ -95,6 +145,7 @@ class AuditLog:
     def __init__(self, path: str):
         self.path = path
         os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
+        self._lock = threading.Lock()
         self._prev = self._recover_tip()
 
     def _recover_tip(self) -> str:
@@ -120,16 +171,17 @@ class AuditLog:
         # ts/kind/chain fields. Without this, any splatted untrusted dict (see
         # Hub.escalate) could forge or erase an event kind - the audit log is
         # the single source of truth, so its framing is not caller-writable.
-        body = {**record, "ts": time.time(), "kind": kind}
-        for k in ("prev_hash", "entry_hash"):
-            body.pop(k, None)
-        eh = self._entry_hash(body, self._prev)
-        line = json.dumps({**body, "prev_hash": self._prev, "entry_hash": eh})
-        with open(self.path, "a") as f:
-            f.write(line + "\n")
-            f.flush()
-            os.fsync(f.fileno())
-        self._prev = eh
+        with self._lock:
+            body = {**record, "ts": time.time(), "kind": kind}
+            for k in ("prev_hash", "entry_hash"):
+                body.pop(k, None)
+            eh = self._entry_hash(body, self._prev)
+            line = json.dumps({**body, "prev_hash": self._prev, "entry_hash": eh})
+            with open(self.path, "a") as f:
+                f.write(line + "\n")
+                f.flush()
+                os.fsync(f.fileno())
+            self._prev = eh
 
     def anchor(self) -> dict:
         """Export an external anchor: {entries, head_hash}. verify_chain

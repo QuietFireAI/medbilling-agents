@@ -85,7 +85,9 @@
    ],
    "receivers": [
     "external"
-   ]
+   ],
+   "audience": "principal",
+   "audience_verified": true
   },
   {
    "intent": "patient.reply",
@@ -148,7 +150,9 @@
    ],
    "receivers": [
     "external"
-   ]
+   ],
+   "audience": "counterparty",
+   "audience_verified": true
   },
   {
    "intent": "claim.status",

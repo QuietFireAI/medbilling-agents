@@ -56,7 +56,7 @@ Dispatcher returns an `ack`.
 | Direction | Route (via 00) | Trigger | Intent |
 |---|---|---|---|
 | IN | ← 02 Claim Scrubbing | Gate-green claims | `scrub.result` |
-| OUT | → clearinghouse/payers (external) | Submissions | `claim.submit` |
+| OUT | → clearinghouse/payers (external) | Submissions - held at the disclosure gate until a human signs its release (`disclosure.authority`) | `claim.submit` |
 | OUT | → 10 / 13 | Status transitions | `claim.status` |
 | OUT | → 02 / 13 | Rejections with codes verbatim | `rejection.notice` |
 | IN | ← 12 Compliance & Deadlines | Timely-filing alerts | `deadline.alert` |

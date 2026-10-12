@@ -221,7 +221,8 @@ class Spoke04PatientComm:
         self.hub = hub
         self.templates = templates or {}
         self.opted_out = set()   # ctx
-        self.sent = []
+        self.sent = []           # acked by the hub
+        self.awaiting_release = {}   # ctx -> [held at the disclosure gate]
 
     def handle(self, env):
         ctx = env.client_context_id
@@ -236,11 +237,23 @@ class Spoke04PatientComm:
                                       env.payload.get("template_id", ""))
             out = {"template_id": env.payload.get("template_id"),
                    "body": body, "facts": env.payload.get("facts", {})}
-            self.sent.append((ctx, out))
-            self.hub.send(_env("04", "external", "patient.message.send",
-                               ctx, out))
+            # 2026-10-12 core sync: the hub can now hold this message at the
+            # disclosure gate. It is recorded as sent only on the hub's ack;
+            # a held message waits for a human's signed release and is logged
+            # under the name of what happened.
+            res = self.hub.send(_env("04", "external",
+                                     "patient.message.send", ctx, out))
+            state = res.get("status") if isinstance(res, dict) else None
+            if state == "ack":
+                self.sent.append((ctx, out))
+                event = "patient_message"
+            elif state == "held":
+                self.awaiting_release.setdefault(ctx, []).append(out)
+                event = "patient_message_held_for_release"
+            else:
+                event = f"patient_message_not_sent_{state}"
             self.hub.send(_env("04", "13", "interaction.log", ctx,
-                               {"event": "patient_message",
+                               {"event": event,
                                 "template": out["template_id"]}))
 
     def patient_reply(self, ctx, text):
@@ -361,8 +374,18 @@ class Spoke07Submission:
                 return          # idempotency: submit once
             self.submitted[ctx] = {"ch_ack": False, "payer_ack": False,
                                    "pkg": env.payload}
-            self.hub.send(_env("07", "external", "claim.submit", ctx,
-                               env.payload))
+            # 2026-10-12 core sync: the payer is a counterparty, so the hub
+            # holds claim.submit until a human signs its release. The hold
+            # is recorded; submission still counts only on both artifacts.
+            res = self.hub.send(_env("07", "external", "claim.submit", ctx,
+                                     env.payload))
+            state = res.get("status") if isinstance(res, dict) else None
+            self.submitted[ctx]["sent"] = state
+            if state != "ack":
+                self.hub.send(_env("07", "13", "interaction.log", ctx,
+                                   {"event": "claim_submit_held_for_release"
+                                    if state == "held"
+                                    else f"claim_submit_not_sent_{state}"}))
         elif env.intent == "secondary.claim.ready":
             # a cascade is a claim: fresh scrub gate, not a shortcut
             self.hub.send(_env("07", "13", "interaction.log", ctx,

@@ -94,6 +94,28 @@ def persisted(hub, intent=None):
             and (intent is None or e["intent"] == intent)]
 
 
+def held(hub, intent=None):
+    """Outbound messages the ABSOLUTE SIGNAL disclosure gate is holding."""
+    return [e for e in hub.audit.read() if e["kind"] == "absolute_signal.hold"
+            and (intent is None or e["intent"] == intent)]
+
+
+def release_held(hub, signer, intent):
+    """The human key, applied in a test: one signed disclosure.authority
+    for each held message with this intent. The hub re-sends the original
+    once. Returns the number released."""
+    n = 0
+    for hid, orig in list(hub._absolute_holds.items()):
+        if orig.intent != intent:
+            continue
+        auth = signed(signer, orig.from_agent, "disclosure.authority",
+                      orig.client_context_id, {"held_envelope_id": hid})
+        res = hub.release_disclosure(auth)
+        assert res["status"] == "ack", res
+        n += 1
+    return n
+
+
 ENC = {"patient": "p1", "provider": "dr-a", "dos": "2026-07-01",
        "codes": ["99213"], "units": 1, "pos": "11",
        "field_provenance": {"patient": "ehr", "provider": "ehr",
@@ -166,6 +188,14 @@ def test_p03_submission_needs_both_artifacts(tmp_path):
     hub, signer, spokes, external = build_swarm(tmp_path)
     ctx = "c-p03"
     _clean_claim(hub, spokes, ctx)
+    # claim.submit goes to the payer (counterparty): the disclosure gate
+    # holds it until a human signs a release - nothing leaves before that
+    assert held(hub, "claim.submit")
+    assert not any(e.intent == "claim.submit" for e in external)
+    assert spokes["07"].submitted[ctx]["sent"] == "held"
+    logs = [e["payload"].get("event") for e in persisted(hub, "interaction.log")]
+    assert "claim_submit_held_for_release" in logs
+    assert release_held(hub, signer, "claim.submit") == 1
     assert any(e.intent == "claim.submit" for e in external)
     assert not persisted(hub, "claim.status")     # one ack is not submitted
     spokes["07"].clearinghouse_ack(ctx)

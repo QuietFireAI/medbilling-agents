@@ -3,7 +3,7 @@
 The stack rounds out three ways to run this identity:
 
 1. **dispatcher-agents** (reference) - the vendored core in `dispatcher/`
-   IS that runtime; nothing to mount, it ships here and the 24-test suite
+   IS that runtime; nothing to mount, it ships here and the 35-test suite
    proves it.
 2. **Hermes** - mount as a governed skill/persona per the contract below.
 3. **OpenClaw** - mount as a skill folder per the contract below.

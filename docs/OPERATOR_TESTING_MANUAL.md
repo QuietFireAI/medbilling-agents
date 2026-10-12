@@ -19,7 +19,7 @@ pip install -r requirements.txt
 ```
 python -m pytest tests_medbilling/ -v
 ```
-**You must see:** `24 passed`, including tests named for every playbook
+**You must see:** `35 passed`, including tests named for every playbook
 P01-P14 and for each absolute line (never-codes, sealed custody, unsigned
 money rejected, $0.00 tolerance, opt-out kill, closed track).
 **Proves:** the claims in the docs are executable, not aspirational.
@@ -32,8 +32,11 @@ python3 tools/run_demo.py
 **You must see, in order:**
 1. ACT 1: `codes on the released claim: ['99213'] <- provider-entered,
    untouched` and `RELEASED: True`
-2. ACT 2: `confirmed submissions so far: 0` after ONE ack, then 2 copies
-   confirmed only after BOTH acks
+2. ACT 2: `claim.submit held at the disclosure gate ... True` and
+   `went to external before a signature: False`; `unsigned release -> reject`;
+   after the signed `disclosure.authority`, `went to external: True`; then
+   `confirmed submissions so far: 0` after ONE ack, and `confirmed
+   submissions: 1` only after BOTH acks
 3. ACT 3: the unruled CO99 adjustment HELD; a ONE-CENT variance raising
    `reconciliation.exception`; the CO50 denial lane `human_packet`; the
    60-day clock ARMED

@@ -39,7 +39,9 @@ closed at load.
    TEMPLATE. The owner edits, ratifies (status line + date + sign-off), then loads.
 4. **Staged outbound**: enable outbound seams one at a time, lowest-risk first
    (record lookups before communications before money-adjacent), each behind its
-   human lane exactly as the spec states.
+   human lane exactly as the spec states. Connecting a seam does not open the
+   disclosure gate: a counterparty message still holds until a human signs
+   its release (README, Outbound messages).
 5. **Rollback is config**: disconnecting a seam returns that lane to manual with
    the record intact. Nothing about rollback loses audit history.
 
@@ -51,6 +53,11 @@ closed at load.
 - [ ] Every connected seam passed the INTEGRATIONS.md conformance checklist
 - [ ] Shadow-mode book comparison signed off by the owner for the trial period
 - [ ] Authority signers registered and signature verification live
+- [ ] Core parity: `python tools/sync_core.py --core <dispatcher-agents> --check`
+      reports zero drift on the deployed checkout
+- [ ] Every outbound route's audience confirmed by the owner (README, Outbound
+      messages), and a named human holds the key that signs
+      `disclosure.authority` releases
 - [ ] Human lanes staffed: every human-routed intent has a named owner
 
 ## Not in scope of this repo

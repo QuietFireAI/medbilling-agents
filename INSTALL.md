@@ -31,7 +31,9 @@ Caveats:
 
 ## Pillar relationship (dispatcher runtime)
 
-This identity contains NO pillar code and NO runtime code, by design. The
+This identity contains NO pillar code, by design. Its runtime code is the
+dispatcher-agents core, vendored byte-identical in `dispatcher/`
+(`tools/sync_core.py --check` proves the match). The
 six pillars (before-turn, open-mind, agent-open-mind, pre-response-
 selfcheck, sleep-marks, splitvantage) install with the DISPATCHER, not with
 the identity: the dispatcher imports each pillar package and binds it to a
@@ -40,7 +42,8 @@ pillar gate that fires on the baseline null identity fires identically on
 this identity's traffic - proven by the P11 demo's six-pillar assertion.
 Install order: dispatcher-agents + six pillar repos first (see its
 PILLAR_TESTING_MANUAL.md), capture the baseline KPIs, then load this
-identity and compare.
+identity and compare. In this repo, `pip install -r requirements.txt`
+installs the six pillars at the pinned commits the suite passed against.
 
 ## Deployment target (direction)
 

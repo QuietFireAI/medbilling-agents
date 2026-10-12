@@ -92,20 +92,42 @@ def main():
         " untouched")
     say(f"  RELEASED: {st['released']}")
 
-    act(2, "SUBMISSION - BOTH ARTIFACTS OR IT DIDN'T HAPPEN")
-    say(f"  claim.submit went to external: "
+    act(2, "SUBMISSION - HELD FOR A SIGNATURE, THEN BOTH ARTIFACTS")
+    held_ids = [i for i, e in hub._absolute_holds.items()
+                if e.intent == "claim.submit"]
+    say(f"  claim.submit held at the disclosure gate (the payer is a"
+        f" counterparty): {bool(held_ids)}")
+    say(f"  claim.submit went to external before a signature: "
         f"{any(e.intent=='claim.submit' for e in external)}")
+    unsigned = Envelope(from_agent="human", to_agent="07",
+                        intent="disclosure.authority", client_context_id=ctx,
+                        payload={"held_envelope_id": held_ids[0]},
+                        provenance={"source": "human",
+                                    "captured_at": "runtime",
+                                    "verbatim_available": True})
+    say(f"  unsigned release -> "
+        f"{hub.release_disclosure(unsigned)['status']}")
+    release = Envelope(from_agent="human", to_agent="07",
+                       intent="disclosure.authority", client_context_id=ctx,
+                       payload={"held_envelope_id": held_ids[0]},
+                       provenance={"source": "human",
+                                   "captured_at": "runtime",
+                                   "verbatim_available": True})
+    signer.sign(release)
+    hub.release_disclosure(release)
+    say(f"  SIGNED disclosure.authority (Ed25519) -> claim.submit went to"
+        f" external: {any(e.intent=='claim.submit' for e in external)}")
     say("  clearinghouse ack arrives... (payer ack still missing ->"
         " NOT submitted)")
     s["07"].clearinghouse_ack(ctx)
-    confirmed = [e for e in hub.audit.read()
+    confirmed = {e["client_context_id"] for e in hub.audit.read()
                  if e["kind"] == "envelope.persisted"
-                 and e["intent"] == "claim.status"]
+                 and e["intent"] == "claim.status"}
     say(f"  confirmed submissions so far: {len(confirmed)}")
     s["07"].payer_ack(ctx)
-    confirmed = [e for e in hub.audit.read()
+    confirmed = {e["client_context_id"] for e in hub.audit.read()
                  if e["kind"] == "envelope.persisted"
-                 and e["intent"] == "claim.status"]
+                 and e["intent"] == "claim.status"}
     say(f"  payer ack arrives -> confirmed submissions: {len(confirmed)}"
         "  (artifacts: ch_ack + payer_ack)")
 

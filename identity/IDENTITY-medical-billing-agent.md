@@ -40,6 +40,7 @@ touching sealed clinical content.
 
 - 15 agents (00-dispatcher + 14 spokes) - see ROSTER.md
 - 44 routes, closed track - identity/routes.json is the single source
+- Outbound audience (owner decision 2026-10-12): `patient.message.send` principal (delivered); `claim.submit` counterparty (held until a human signs a `disclosure.authority` release)
 - 14 playbooks (P01-P14) - priority classes in identity/priority.json
 - Tuple layer per agent (DECISIONS.md) + swarm tuples (SWARM.md)
 - Conduct constants: MANNERS.md (hash-registered at boot attestation)

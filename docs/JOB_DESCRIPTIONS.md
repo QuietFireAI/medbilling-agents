@@ -198,7 +198,7 @@ send log.
 - Never resubmit without a new scrub version - duplicate submission is a payer-integrity violation.
 
 **Talks through these doors (all via 00):**
-- OUT → clearinghouse/payers (external): Submissions (`claim.submit`)
+- OUT → clearinghouse/payers (external): Submissions - held at the disclosure gate until a human signs its release (`disclosure.authority`) (`claim.submit`)
 - OUT → 10 / 13: Status transitions (`claim.status`)
 - OUT → 02 / 13: Rejections with codes verbatim (`rejection.notice`)
 - IN ← 02 Claim Scrubbing: Gate-green claims (`scrub.result`)

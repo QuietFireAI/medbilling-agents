@@ -3,10 +3,11 @@
 An **identity side-load**: everything vertical-specific for a 15-agent
 medical-billing (revenue cycle) swarm, loadable into the content-neutral
 [dispatcher-agents](https://github.com/QuietFireAI/dispatcher-agents) runtime.
-The runtime never contains vertical text; this repo never contains transport
-code. That split is the architecture.
+The runtime never contains vertical text, and this repo never edits transport
+code: `dispatcher/` holds a byte-identical copy of the dispatcher-agents core,
+checked by `tools/sync_core.py --check`. That split is the architecture.
 
-**Status: v0.2 ratified 2026-07-18 (extended from v0.1 2026-07-11) - owner sign-off. WORKING BUILD: vendored dispatcher core + real spokes, 24-test end-to-end suite (`tests_medbilling/`), live demo (`tools/run_demo.py`), and an MCP mount (`docs/MOUNTING.md`). No licensed legal, compliance (HIPAA), or coding-practice review has been performed.**
+**Status: v0.2 ratified 2026-07-18 (extended from v0.1 2026-07-11) - owner sign-off. WORKING BUILD: vendored dispatcher core + real spokes, 35-test suite (`tests_medbilling/`: playbooks end to end plus the core boot test), live demo (`tools/run_demo.py`), and an MCP mount (`docs/MOUNTING.md`). No licensed legal, compliance (HIPAA), or coding-practice review has been performed.**
 
 ## What this is for
 
@@ -33,7 +34,11 @@ What it never does - the five absolute lines (identity/IDENTITY-medical-billing-
 
 | Path | What it is |
 |---|---|
-| `identity/routes.json` | The closed track: 35 (intent, senders, receivers) routes - single source of truth |
+| `identity/routes.json` | The closed track: 44 (intent, senders, receivers) routes, outbound routes labelled with their audience - single source of truth |
+| `dispatcher/` | The dispatcher-agents core, vendored: the 16 files listed in `tools/sync_core.py`, byte-identical to core and never edited here; this identity's own runtime (`medbilling_spokes.py`, `identity_mcp.py`, `sweep_runner.py`) sits beside them and the sync never touches it |
+| `tools/sync_core.py` | Copies the core in (`--core <path>`) or checks it (`--check`: exit 1 on any drift) |
+| `tests_medbilling/test_core_boot.py` | This identity loaded into the core: loader, audience labels, principal delivery, counterparty hold and signed release, authority signatures, closed track |
+| `requirements.txt` | pytest, cryptography, the six pillars pinned to the commits the suite passed against, and the MCP package |
 | `identity/priority.json` | JIT playbook priority classes (ratified 2026-07-11; extended & ratified 2026-07-18) |
 | `identity/IDENTITY-medical-billing-agent.md` | The identity declaration |
 | `00-dispatcher/ ... 14-daily-operations/` | 15 agent SKILL.md + DECISIONS.md (tuple layer) |
@@ -44,10 +49,30 @@ What it never does - the five absolute lines (identity/IDENTITY-medical-billing-
 | `generate_skills.py` / `gen_meta.py` / `gen_playbooks.py` / `gen_tuple_index.py` | Generators - data tables are the spec; files are build artifacts |
 | `verify_swarm.py` | Enforcement: tuple legality, edge completeness, regression - exit 0 = clean |
 
+## Outbound messages
+
+Every route that leaves the swarm names its audience in `identity/routes.json`
+(owner decision, 2026-10-12):
+
+| Route | Sender | Audience | On send |
+|---|---|---|---|
+| `patient.message.send` | 04 | principal | delivered on the ack |
+| `claim.submit` | 07 | counterparty | held until a human signs its release |
+
+The principal is the party this identity serves. A counterparty message is
+held in `clarification.request` before it is persisted or delivered (the hold
+itself is on the audit log), and goes out only when a human signs a
+`disclosure.authority` naming that exact message (`Hub.release_disclosure`).
+It goes out once; an unsigned or repeated release sends nothing. A route left
+without a label is treated as counterparty.
+
 ## Verify
 
 ```bash
+pip install -r requirements.txt
 python3 verify_swarm.py    # 0 failures, 0 warnings expected
+python -m pytest tests_medbilling/    # 35 passed
+python tools/sync_core.py --core ../dispatcher-agents --check   # 16 files, zero drift
 ```
 
 ## Load into the runtime
@@ -68,7 +93,7 @@ priority table's status on every load - never silently.
 
 ## Sibling identities
 
-- [listing-agents](https://github.com/QuietFireAI/listing-agents) - real-estate listing vertical (ratified)
+- [listing-assistants](https://github.com/QuietFireAI/listing-assistants) (formerly listing-agents) - real-estate listing vertical (ratified)
 - [claim-agents](https://github.com/QuietFireAI/claim-agents) - insurance claims vertical (ratified)
 - [reservation-agents](https://github.com/QuietFireAI/reservation-agents) - park/resort reservations vertical (ratified)
 - mortgage-agents, property-mgmt-agents, practice-agents - this drop's siblings
@@ -82,7 +107,8 @@ free. **Production and commercial use require a paid license from
 QuietFireAI or full AGPL-3.0 compliance.** Building derivative identities
 for third parties is not permitted without a commercial license. The
 supported commercial operating environment is TelsonBase. The open chassis
-this runs on (dispatcher-agents) is Apache-2.0 and separate.
+this runs on (dispatcher-agents) is Apache-2.0 and separate. The vendored copy in
+`dispatcher/` keeps that license (`dispatcher/LICENSE-CORE`).
 
 *License text is a placeholder pending counsel review.*
 

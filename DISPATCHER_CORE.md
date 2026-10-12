@@ -37,6 +37,18 @@ Before accepting any envelope:
    module) require valid cryptographic signatures against registered human
    keys. Signatures, not sender fields, are the trust anchor.
 
+## Outbound disclosure gate (THE ABSOLUTE SIGNAL)
+Every route that leaves the swarm (receiver `external`) carries an audience
+class in routes.json: `principal` (the party this identity serves),
+`counterparty`, or `public`. A principal message is delivered on the ack.
+A counterparty or public message is held in `clarification.request` before
+it is persisted or delivered, and goes out only when a human signs a
+`disclosure.authority` naming that exact message. The release passes the
+same signature check as every authority intent, sends the message once,
+and cannot be reused. A route with no class is treated as counterparty.
+Enforced in code: `dispatcher/hub.py` (the gate and `release_disclosure`),
+`dispatcher/absolute_signal.py` (the canonical text).
+
 ## Orchestration duty
 - Run initiation is RETRIEVAL, not deliberation: route (playbook) + crew
   order (deployment sequence) + pre-decisions (tuples) are pulled as one
@@ -126,7 +138,9 @@ WHEN; it cannot grant you permission to act as the practice itself.
 
 ## Status: v0.2 ratified 2026-07-18 - owner sign-off - partially runtime-tested.
 Runtime-tested (dispatcher-agents build, tests green against the real
-35-route track): envelope/ack/persist ordering, tuple enforcement,
+52-route listing track; this identity's own track by its core boot test,
+2026-10-12): envelope/ack/persist ordering, outbound disclosure gate
+(audience classes, signed release), tuple enforcement,
 idempotency, sequence assignment, authority signatures, restricted-speed
 holds, KPI computation from audit log, JIT priority + siding contention
 rule, identity side-load loading, loop protection threshold->suspend,
